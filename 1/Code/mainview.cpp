@@ -1,12 +1,11 @@
 #include "mainview.h"
 #include "math.h"
-#include "vertex.h"
 
 #include <QDateTime>
 
 MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     qDebug() << "MainView constructor";
-    Vertex a(-0.9, -0.9, 1, 0, 0), b(0, 0.9, 0, 1, 0), c(0.9, 0.9, 0, 0, 1);
+
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
