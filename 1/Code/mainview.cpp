@@ -1,5 +1,6 @@
 #include "mainview.h"
 #include "math.h"
+#include "vertex.h"
 
 #include <QDateTime>
 
@@ -31,6 +32,13 @@ void MainView::initializeGL() {
     QString glVersion;
     glVersion = reinterpret_cast<const char*>(glGetString(GL_VERSION));
     qDebug() << ":: Using OpenGL" << qPrintable(glVersion);
+
+    //Code here
+    Vertex v[3];
+    v[1] = new vertex(-0.9, -0.9, 0,1, 0);
+    v[2] = new vertex(0.9, -0.9, 1, 0, 0);
+    v[3] = new vertex(0, 0.9, 0, 0, 1);
+    //END
 }
 
 void MainView::resizeGL(int newWidth, int newHeight) {
