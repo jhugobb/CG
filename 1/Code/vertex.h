@@ -3,18 +3,20 @@
 
 struct Vertex
 {
-    float x;
-    float y;
-    float r;
-    float g;
-    float b;
+    float coord[2]; // [x,y]
+    float color[3]; // [r, g, b]
 
     Vertex(float givenx, float giveny, float givenr, float giveng, float givenb) {
-        x = givenx;
-        y = giveny;
-        r = givenr;
-        g = giveng;
-        b = givenb;
+        coord[0] = givenx;
+        coord[1] = giveny;
+        color[0] = givenr;
+        color[1] = giveng;
+        color[2] = givenb;
     }
+
+    Vertex() {
+
+    }
+
 };
 #endif // VERTEX_H
