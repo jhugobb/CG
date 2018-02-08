@@ -41,8 +41,14 @@ void MainView::initializeGL() {
     v[2] = new vertex(0, 0.9, 0, 0, 1);
     //END
 
-    if(p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl"))
-        printf("SUCCESS\n");
+    //initializing the shader
+    p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    p.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
+    p.link();
+    p.bind();
+
+    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao);
 
 }
 

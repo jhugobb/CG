@@ -15,6 +15,9 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 
 public:
     MainView(QWidget *parent = 0);
+    QOpenGLShaderProgram p;
+    GLuint vbo;
+    GLuint vao;
     ~MainView();
 
 protected:
