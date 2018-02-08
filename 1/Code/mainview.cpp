@@ -47,8 +47,21 @@ void MainView::initializeGL() {
     p.link();
     p.bind();
 
+    //creating the vbo and vao
     glGenBuffers(1, &vbo);
     glGenVertexArrays(1, &vao);
+
+    //sending the triangle to the gpu
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    //Telling the GPU how the data has been layed out
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribIPointer(0, sizeof(float)*2, GL_FLOAT, 0, 0);
+
+    //glBufferData();
 
 }
 
