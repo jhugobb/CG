@@ -41,7 +41,7 @@ void MainView::initializeGL() {
     v[2] = new vertex(0, 0.9, 0, 0, 1);
     //END
 
-    if(addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl"))
+    if(p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl"))
         printf("SUCCESS\n");
 
 }
