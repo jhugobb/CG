@@ -35,10 +35,14 @@ void MainView::initializeGL() {
 
     //Code here
     Vertex v[3];
-    v[1] = new vertex(-0.9, -0.9, 0,1, 0);
-    v[2] = new vertex(0.9, -0.9, 1, 0, 0);
-    v[3] = new vertex(0, 0.9, 0, 0, 1);
+    v[0] = new vertex(-0.9, -0.9, 0,1, 0);
+    v[1] = new vertex(0.9, -0.9, 1, 0, 0);
+    v[2] = new vertex(0, 0.9, 0, 0, 1);
     //END
+
+    if(addShaderFromSourceFile(1, "Resources/resources.qrc///shaders/frashader.glsl"))
+        printf("SUCCESS\n");
+
 }
 
 void MainView::resizeGL(int newWidth, int newHeight) {
