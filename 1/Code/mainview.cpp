@@ -35,7 +35,7 @@ void MainView::initializeGL() {
     qDebug() << ":: Using OpenGL" << qPrintable(glVersion);
 
     //Code here
-    Vertex v[3];
+    vertex v[3];
     v[0] = new vertex(-0.9, -0.9, 0,1, 0);
     v[1] = new vertex(0.9, -0.9, 1, 0, 0);
     v[2] = new vertex(0, 0.9, 0, 0, 1);
@@ -54,14 +54,16 @@ void MainView::initializeGL() {
     //sending the triangle to the gpu
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertex)*3 , v, GL_STATIC_DRAW);
+
 
     //Telling the GPU how the data has been layed out
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    glVertexAttribIPointer(0, sizeof(float)*2, GL_FLOAT, 0, 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (GLvoid*) (sizeof(float)*2));
 
-    //glBufferData();
 
 }
 

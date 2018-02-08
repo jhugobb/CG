@@ -1,7 +1,7 @@
 #ifndef VERTEX_H
 #define VERTEX_H
 
-typedef struct vertex
+struct vertex
 {
     float coor[2];
     float color[3];
@@ -13,6 +13,6 @@ typedef struct vertex
         this->color[1] = g;
         this->color[2] = b;
     }
-}* Vertex;
+};
 
 #endif // VERTEX_H
