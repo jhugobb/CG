@@ -2,5 +2,6 @@
 
 void main()
 {
+    in vec3 interpolatedColor;
 
 }

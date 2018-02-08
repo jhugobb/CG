@@ -36,9 +36,9 @@ void MainView::initializeGL() {
 
     //Code here
     Vertex v[3];
-    v[0] = new Vertex(-0.9, -0.9, 0,1, 0);
-    v[1] = new Vertex(0.9, -0.9, 1, 0, 0);
-    v[2] = new Vertex(0, 0.9, 0, 0, 1);
+    v[0] = Vertex(-0.9, -0.9, 0,1, 0);
+    v[1] = Vertex(0.9, -0.9, 1, 0, 0);
+    v[2] = Vertex(0, 0.9, 0, 0, 1);
     //END
 
     //initializing the shader

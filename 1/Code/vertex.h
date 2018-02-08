@@ -13,6 +13,9 @@ struct Vertex
         this->color[1] = g;
         this->color[2] = b;
     }
+
+    Vertex(){
+    }
 };
 
 #endif // VERTEX_H
