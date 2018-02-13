@@ -23,14 +23,20 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QOpenGLShaderProgram shaderProgram;
 
 public:
-    GLuint vbo[3]; //[cube, pyramid]
-    GLuint vao[3]; //[cube, pyramid]
-    QMatrix4x4 originCubeM = QMatrix4x4();
-    QMatrix4x4 originPyramidM = QMatrix4x4();
-    QMatrix4x4 originModelM = QMatrix4x4();
+    enum MODELINDEX
+    {
+        CUBE = 0,
+        PYRAMID,
+        MODEL,
+        COUNT
+    };
+
+    GLuint vbo[MODELINDEX::COUNT]; //[cube, pyramid, model]
+    GLuint vao[MODELINDEX::COUNT]; //[cube, pyramid, model]
     QMatrix4x4 cubeMatrix;
     QMatrix4x4 pyramidMatrix;
     QMatrix4x4 modelMatrix;
+    qreal modelScale = 1.0;
     QMatrix4x4 projMatrix = QMatrix4x4();
     qreal xRotation = 0;
     qreal yRotation = 0;
@@ -50,6 +56,9 @@ public:
     ~MainView();
 
     void rotate(qreal x, qreal y, qreal z);
+    void turnCubeToOriginal();
+    void turnPyramidToOriginal ();
+    void turnModelToOriginal();
 
     // Functions for widget input events
     void setRotation(int rotateX, int rotateY, int rotateZ);

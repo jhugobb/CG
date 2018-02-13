@@ -44,6 +44,10 @@ public:
     bool hasTextureCoords();
     int getNumTriangles();
 
+    float getXLength();
+    float getYLength() ;
+    float getZLength() ;
+    float getMaxLength() ;
     void unitize();
 
 private:

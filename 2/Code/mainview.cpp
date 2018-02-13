@@ -22,13 +22,35 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     //making the matrix initial transformations
 
-    originCubeM.translate(2, 0 , -6);
-    originPyramidM.translate(-2, 0, -6);
-    originModelM.translate(0, 0, -10);
-    cubeMatrix = QMatrix4x4(originCubeM);
-    pyramidMatrix = QMatrix4x4(originPyramidM);
-    modelMatrix = QMatrix4x4(originModelM);
-    projMatrix.perspective(60, 1, -1, 1);
+    turnCubeToOriginal();
+    turnPyramidToOriginal();
+    projMatrix.perspective(60, 1, 0, 100);
+}
+
+/**
+ * @brief MainView::turnCubeToOriginal Translates and scales the cube to its original state
+ */
+void MainView::turnCubeToOriginal () {
+    cubeMatrix = QMatrix4x4();
+    cubeMatrix.translate(2, 0, -6);
+}
+
+/**
+ * @brief MainView::turnCubeToOriginal Translates and scales the pyramid to its original state
+ */
+void MainView::turnPyramidToOriginal () {
+    pyramidMatrix = QMatrix4x4();
+    pyramidMatrix.translate(-2, 0, -6);
+}
+
+/**
+ * @brief MainView::turnModelToOriginal Translates and scales the model to its original state
+ * @param m Model
+ */
+void MainView::turnModelToOriginal () {
+    modelMatrix = QMatrix4x4();
+    modelMatrix.translate(0, 0, -10);
+    modelMatrix.scale(modelScale);
 }
 
 /**
@@ -51,86 +73,6 @@ MainView::~MainView() {
     shaderProgram.release();
     glDeleteBuffers(3, vbo);
     glDeleteVertexArrays(3, vao);
-}
-
-/**
- * @brief getXLength Calculates the length of the element (assuming the vertexes composes an element) from the X axis perspective.
- * @param v Vertexes
- * @param N Number of vertexes
- * @return X Length
- */
-float getXLength (Vertex *v, int N) {
-    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
-    for(int i = 0 ; i < N ; i++) {
-        if (v[i].coord[0] < min) {
-            min = v[i].coord[0];
-        }
-        else if (v[i].coord[0] > max) {
-            max = v[i].coord[0];
-        }
-
-    }
-    return (max - min);
-}
-
-/**
- * @brief getYLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
- * @param v Vertexes
- * @param N Number of vertexes
- * @return Y Length
- */
-float getYLength (Vertex *v, int N) {
-    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
-    for(int i = 0 ; i < N ; i++) {
-        if (v[i].coord[1] < min) {
-            min = v[i].coord[1];
-        }
-        else if (v[i].coord[1] > max) {
-            max = v[i].coord[1];
-        }
-
-    }
-    return (max - min);
-}
-
-/**
- * @brief getZLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
- * @param v Vertexes
- * @param N Number of vertexes
- * @return Z Length
- */
-float getZLength (Vertex *v, int N) {
-    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
-    for(int i = 0 ; i < N ; i++) {
-        if (v[i].coord[2] < min) {
-            min = v[i].coord[2];
-        }
-        else if (v[i].coord[2] > max) {
-            max = v[i].coord[2];
-        }
-
-    }
-    return (max - min);
-}
-
-/**
- * @brief getMaxLength Returns the greatest length from the 3 axis perspective of a model.
- * @param v Model.
- * @param N Number of vertexes.
- * @return Greatest length.
- */
-float getMaxLength (Vertex *v, int N) {
-    float max = getXLength(v, N), tmp;
-
-    if ((tmp = getYLength(v, N)) > max) {
-        max = tmp;
-    }
-
-    if ((tmp = getZLength(v, N)) > max) {
-        max = tmp;
-    }
-
-    return max;
 }
 
 
@@ -224,7 +166,7 @@ void MainView::initializeGL() {
     pyr.toVArray(p);
 
     glBindVertexArray(vao[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::PYRAMID]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0);
@@ -233,6 +175,7 @@ void MainView::initializeGL() {
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
 
     Model m = Model(":/models/sphere.obj");
+    m.unitize();
 
     QVector<QVector3D> vm = m.getVertices();
     modelSize = vm.size();
@@ -249,12 +192,13 @@ void MainView::initializeGL() {
     }
 
     //Scaling of the imported model in order for it to fit in a unit cube automatically
-    originModelM.scale(2.0 / getMaxLength(vv, modelSize));
-    modelMatrix = QMatrix4x4(originModelM);
+    //modelScale = 2.0 / getMaxLength(vv, modelSize);
+
+    turnModelToOriginal();
 
     //Buffering the model
     glBindVertexArray(vao[2]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::MODEL]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
 
     //Sending layout info
@@ -323,10 +267,10 @@ void MainView::paintGL() {
  */
 void MainView::resizeGL(int newWidth, int newHeight) 
 {
-    // TODO: Update projection to fit the new aspect ratio
-    //identity?
+    float ratio = ((float) newWidth) / ((float) newHeight);
+
     projMatrix.setToIdentity();
-    projMatrix.perspective(60, newWidth / newHeight, -1, 1);
+    projMatrix.perspective(60, ratio, 0, 100);
     update();
 
 }
@@ -338,9 +282,9 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
     qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << "," << rotateZ << ")";
 
     //reinitialization of the matrixes so that the rotation is effectively correct
-    cubeMatrix = QMatrix4x4(originCubeM);
-    pyramidMatrix = QMatrix4x4(originPyramidM);
-    modelMatrix = QMatrix4x4(originModelM);
+    turnCubeToOriginal();
+    turnPyramidToOriginal();
+    turnModelToOriginal();
 
     //qreal x = ((qreal) rotateX) / 360;
     xRotation = rotateX;
@@ -381,9 +325,9 @@ void MainView::setScale(int scale)
     s = s / 100.0;
     this->scale = s;
 
-    cubeMatrix = QMatrix4x4(originCubeM);
-    pyramidMatrix = QMatrix4x4(originPyramidM);
-    modelMatrix = QMatrix4x4(originModelM);
+    turnCubeToOriginal();
+    turnPyramidToOriginal();
+    turnModelToOriginal();
     rotate(xRotation, yRotation, zRotation);
     cubeMatrix.scale(s);
     pyramidMatrix.scale(s);
