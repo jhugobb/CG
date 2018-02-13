@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QMatrix4x4>
 
 // A Private Vertex class for vertex comparison
 // DO NOT include "vertex.h" or something similar in this file
@@ -73,6 +74,87 @@ Model::Model(QString filename) {
 }
 
 /**
+ * @brief getXLength Calculates the length of the element (assuming the vertexes composes an element) from the X axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return X Length
+ */
+float Model::getXLength () {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < vertices.size() ; i++) {
+        if (vertices.at(i).x() < min) {
+            min = vertices.at(i).x();
+        }
+        else if (vertices.at(i).x() > max) {
+            max = vertices.at(i).x();
+        }
+
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getYLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Y Length
+ */
+float Model::getYLength () {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < vertices.size() ; i++) {
+        if (vertices.at(i).y() < min) {
+            min = vertices.at(i).y();
+        }
+        else if (vertices.at(i).y() > max) {
+            max = vertices.at(i).y();
+        }
+
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getZLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Z Length
+ */
+float Model::getZLength () {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < vertices.size() ; i++) {
+        if (vertices.at(i).z() < min) {
+            min = vertices.at(i).z();
+        }
+        else if (vertices.at(i).z() > max) {
+            max = vertices.at(i).z();
+        }
+
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getMaxLength Returns the greatest length from the 3 axis perspective of a model.
+ * @param v Model.
+ * @param N Number of vertexes.
+ * @return Greatest length.
+ */
+float Model::getMaxLength () {
+    float max = getXLength(), tmp;
+
+    if ((tmp = getYLength()) > max) {
+        max = tmp;
+    }
+
+    if ((tmp = getZLength()) > max) {
+        max = tmp;
+    }
+
+    return max;
+}
+
+
+/**
  * @brief Model::unitze Not Implemented yet!
  *
  * Unitize the model by scaling so that it fits a box with sides 1
@@ -81,8 +163,17 @@ Model::Model(QString filename) {
  *
  */
 void Model::unitize() {
-    qDebug() << "TODO: implement this yourself";
+    QMatrix4x4 m = QMatrix4x4();
+    m.scale(2.0 / getMaxLength());
+    QVector<QVector3D> tmp = QVector<QVector3D>();
+
+    for (int i = 0 ; i < vertices.size() ; i++) {
+        tmp.append(m * vertices.at(i));
+    }
+
+    vertices = tmp;
 }
+
 
 QVector<QVector3D> Model::getVertices() {
     return vertices;
