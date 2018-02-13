@@ -15,6 +15,9 @@ MainView::~MainView() {
     debugLogger->stopLogging();
 
     qDebug() << "MainView destructor";
+
+    glDeleteBuffers(sizeof(Vertex),&vbo);
+    glDeleteVertexArrays(sizeof(Vertex), &vao);
 }
 
 void MainView::initializeGL() {
@@ -36,9 +39,9 @@ void MainView::initializeGL() {
 
     //Code here
     Vertex v[3];
-    v[0] = Vertex(-0.9, -0.9, 0,1, 0);
-    v[1] = Vertex(0.9, -0.9, 1, 0, 0);
-    v[2] = Vertex(0, 0.9, 0, 0, 1);
+    v[0] = Vertex(-1, -1, 0,1, 0);
+    v[1] = Vertex(1, -1, 1, 0, 0);
+    v[2] = Vertex(0, 1, 0, 0, 1);
     //END
 
     //initializing the shader
@@ -74,7 +77,9 @@ void MainView::resizeGL(int newWidth, int newHeight) {
 }
 
 void MainView::paintGL() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void MainView::onMessageLogged( QOpenGLDebugMessage Message ) {
