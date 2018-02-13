@@ -22,6 +22,9 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QOpenGLShaderProgram shaderProgram;
 
 public:
+    GLuint vbo;
+    GLuint vao;
+    QOpenGLShaderProgram p;
     enum ShadingMode : GLuint
     {
         PHONG = 0, NORMAL, GOURAUD

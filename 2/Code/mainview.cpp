@@ -1,5 +1,7 @@
 #include "mainview.h"
 #include "math.h"
+#include "vertex.h"
+#include "square.h"
 
 #include <QDateTime>
 
@@ -69,6 +71,45 @@ void MainView::initializeGL() {
     glClearColor(0.2f, 0.5f, 0.7f, 0.0f);
 
     createShaderProgram();
+
+    //creating 6 vertices for the square
+    Vertex v[4];
+    v[0] = Vertex(1, 1, 0, 1, 0, 0);
+    v[1] = Vertex(-1, 1, 0, 0, 0, 1);
+    v[2] = Vertex(-1, -1, 0, 0, 1, 0);
+    v[3] = Vertex(1, -1, 0, 1, 0, 0);
+    Square sq = Square(v);
+
+    // Initializing the shader programs
+    p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
+    p.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
+    p.link();
+    p.bind();
+
+    // Generating the OpenGL Objects
+    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao);
+
+
+    // Sending the cube to the GPU (filling the vbo)
+    Vertex square[6];
+    sq.toVArray(square);
+
+
+    for(int i = 0 ; i < 6 ; i++){
+        printf("(%f, %f, %f) (%f, %f, %f)\n", square[i].coord[0], square[i].coord[1], square[i].coord[2], square[i].color[0], square[i].color[1], square[i].color[2]);
+    }
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Square), square, GL_STATIC_DRAW);
+
+    // Telling the GPU the data has been layed out
+    GLsizei size = sizeof(Vertex);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
 }
 
 void MainView::createShaderProgram()
@@ -95,7 +136,7 @@ void MainView::paintGL() {
 
     shaderProgram.bind();
 
-    // Draw here
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     shaderProgram.release();
 }
