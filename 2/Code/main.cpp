@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSurfaceFormat>
+#include "vertex.h"
+#include "square.h"
+#include <iostream>
 
 int main(int argc, char *argv[])
 {
