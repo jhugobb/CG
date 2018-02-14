@@ -23,7 +23,8 @@ HEADERS  += mainwindow.h \
     model.h \
     vertex.h \
     triangle.h \
-    square.h
+    square.h \
+    cube.h
 
 FORMS    += mainwindow.ui
 

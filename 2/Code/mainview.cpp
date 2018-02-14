@@ -2,6 +2,7 @@
 #include "math.h"
 #include "vertex.h"
 #include "square.h"
+#include "cube.h"
 
 #include <QDateTime>
 
@@ -13,6 +14,7 @@
  * @param parent
  */
 MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
+
     qDebug() << "MainView constructor";
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -72,13 +74,17 @@ void MainView::initializeGL() {
 
     createShaderProgram();
 
-    //creating 6 vertices for the square
-    Vertex v[4];
-    v[0] = Vertex(1, 1, 0, 1, 0, 0);
-    v[1] = Vertex(-1, 1, 0, 0, 0, 1);
-    v[2] = Vertex(-1, -1, 0, 0, 1, 0);
-    v[3] = Vertex(1, -1, 0, 1, 0, 0);
-    Square sq = Square(v);
+    //creating 8 vertices for the cube
+    Vertex v[8];
+    v[0] = Vertex(1, 1, -1, 1, 0, 0);
+    v[1] = Vertex(-1, 1, -1, 0, 0, 1);
+    v[2] = Vertex(-1, -1, -1, 0, 1, 0);
+    v[3] = Vertex(1, -1, -1, 1, 0, 0);
+    v[4] = Vertex(1, 1, 1, 1, 0, 0);
+    v[5] = Vertex(-1, 1, 1, 0, 0, 1);
+    v[6] = Vertex(-1, -1, 1, 0, 1, 0);
+    v[7] = Vertex(1, -1, 1, 1, 0, 0);
+    Cube cube = Cube(v);
 
     // Initializing the shader programs
     p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
@@ -92,17 +98,18 @@ void MainView::initializeGL() {
 
 
     // Sending the cube to the GPU (filling the vbo)
-    Vertex square[6];
-    sq.toVArray(square);
+    Vertex c[36];
+    cube.toVArray(c);
 
 
-    for(int i = 0 ; i < 6 ; i++){
-        printf("(%f, %f, %f) (%f, %f, %f)\n", square[i].coord[0], square[i].coord[1], square[i].coord[2], square[i].color[0], square[i].color[1], square[i].color[2]);
+    for(int i = 0 ; i < 36 ; i++){
+        printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
     }
+
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Square), square, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_STATIC_DRAW);
 
     // Telling the GPU the data has been layed out
     GLsizei size = sizeof(Vertex);
@@ -136,7 +143,7 @@ void MainView::paintGL() {
 
     shaderProgram.bind();
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     shaderProgram.release();
 }
