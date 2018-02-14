@@ -3,12 +3,13 @@
 
 struct Vertex
 {
-    float coord[2]; // [x,y]
+    float coord[3]; // [x,y,z]
     float color[3]; // [r,g,b]
 
-    Vertex(float givenx, float giveny, float givenr, float giveng, float givenb) {
+    Vertex(float givenx, float giveny, float givenz, float givenr, float giveng, float givenb) {
         coord[0] = givenx;
         coord[1] = giveny;
+        coord[2] = givenz;
         color[0] = givenr;
         color[1] = giveng;
         color[2] = givenb;

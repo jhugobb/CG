@@ -7,15 +7,14 @@
 MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     qDebug() << "MainView constructor";
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-
 }
 
 MainView::~MainView() {
     debugLogger->stopLogging();
 
     qDebug() << "MainView destructor";
-    glDeleteBuffers(3, &vbo);
-    glDeleteVertexArrays(3, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteVertexArrays(1, &vao);
 }
 
 void MainView::initializeGL() {

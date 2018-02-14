@@ -2,6 +2,7 @@
 #define MAINVIEW_H
 
 #include "model.h"
+#include "vertex.h"
 
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -20,6 +21,13 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QTimer timer; // timer used for animation
 
     QOpenGLShaderProgram shaderProgram;
+
+    GLuint vbo[3];   // [cube, pyramid, model]
+    GLuint vao[3];   // [cube, pyramid, model]
+    Vertex tCube[36];
+    Vertex tPyramid[18];
+    QMatrix4x4 matrix[4];    // [cube, pyramid, perspective, model]
+    int nbrOfModelVertexes;
 
 public:
     enum ShadingMode : GLuint
