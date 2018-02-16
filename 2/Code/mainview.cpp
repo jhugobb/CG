@@ -86,11 +86,13 @@ void MainView::initializeGL() {
     v[7] = Vertex(1, -1, 1, 1, 0, 0);
     Cube cube = Cube(v);
 
+    /*
     // Initializing the shader programs
     p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
     p.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
     p.link();
     p.bind();
+    */
 
     // Generating the OpenGL Objects
     glGenBuffers(1, &vbo);
@@ -102,9 +104,9 @@ void MainView::initializeGL() {
     cube.toVArray(c);
 
 
-    for(int i = 0 ; i < 36 ; i++){
+    /*for(int i = 0 ; i < 36 ; i++){
         printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
-    }
+    }*/
 
 
     glBindVertexArray(vao);
@@ -113,10 +115,17 @@ void MainView::initializeGL() {
 
     // Telling the GPU the data has been layed out
     GLsizei size = sizeof(Vertex);
+
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
+
+    //making the matrix initial transformations
+    cubeMatrix.translate(2, 0 , -6);
+    pyramidMatrix.translate(-2, 0, -6);
+    projMatrix.perspective(60, 1, 3, 3);
+
 }
 
 void MainView::createShaderProgram()
@@ -127,6 +136,10 @@ void MainView::createShaderProgram()
     shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader.glsl");
     shaderProgram.link();
+
+    cubeLocation = shaderProgram.uniformLocation("cubeTransform");
+    pyramidLocation = shaderProgram.uniformLocation("pyramidTransform");
+    projLocation = shaderProgram.uniformLocation("projTransform");
 }
 
 // --- OpenGL drawing
@@ -142,6 +155,8 @@ void MainView::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shaderProgram.bind();
+
+    glUniformMatrix4fv();
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 

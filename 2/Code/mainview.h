@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QVector3D>
 #include <memory>
+#include <QMatrix4x4>
 
 class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
@@ -25,6 +26,13 @@ public:
     GLuint vbo;
     GLuint vao;
     QOpenGLShaderProgram p;
+    QMatrix4x4 cubeMatrix = QMatrix4x4();
+    QMatrix4x4 pyramidMatrix = QMatrix4x4();
+    QMatrix4x4 projMatrix = QMatrix4x4();
+    GLint cubeLocation;
+    GLint pyramidLocation;
+    GLint projLocation;
+
     enum ShadingMode : GLuint
     {
         PHONG = 0, NORMAL, GOURAUD
