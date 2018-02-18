@@ -219,9 +219,14 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
 
-    qreal x = ((qreal) rotateX) / 360;
+    //qreal x = ((qreal) rotateX) / 360;
 
-    cubeMatrix.rotate(10, x, rotateY, rotateZ);
+    cubeMatrix.rotate(rotateX, 1, 0, 0);
+    cubeMatrix.rotate(rotateY, 0, 1, 0);
+    cubeMatrix.rotate(rotateZ, 0, 0, 1);
+    pyramidMatrix.rotate(rotateX, 1, 0, 0);
+    pyramidMatrix.rotate(rotateY, 0, 1, 0);
+    pyramidMatrix.rotate(rotateZ, 0, 0, 1);
     update();
 }
 
