@@ -220,14 +220,29 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
     pyramidMatrix = QMatrix4x4(originPyramidM);
 
     //qreal x = ((qreal) rotateX) / 360;
+    xRotation = rotateX;
+    yRotation = rotateY;
+    zRotation = rotateZ;
 
-    cubeMatrix.rotate(rotateX, 1, 0, 0);
-    cubeMatrix.rotate(rotateY, 0, 1, 0);
-    cubeMatrix.rotate(rotateZ, 0, 0, 1);
-    pyramidMatrix.rotate(rotateX, 1, 0, 0);
-    pyramidMatrix.rotate(rotateY, 0, 1, 0);
-    pyramidMatrix.rotate(rotateZ, 0, 0, 1);
+    cubeMatrix.scale(scale);
+    pyramidMatrix.scale(scale);
+    rotate(xRotation, yRotation, zRotation);
     update();
+}
+
+/**
+ * @brief MainView::rotate Auxiliary function to define the rotation of the models.
+ * @param x X axis rotation.
+ * @param y Y axis rotation.
+ * @param z Z axis rotation.
+ */
+void MainView::rotate(qreal x, qreal y, qreal z) {
+    cubeMatrix.rotate(x, 1, 0, 0);
+    cubeMatrix.rotate(y, 0, 1, 0);
+    cubeMatrix.rotate(z, 0, 0, 1);
+    pyramidMatrix.rotate(x, 1, 0, 0);
+    pyramidMatrix.rotate(y, 0, 1, 0);
+    pyramidMatrix.rotate(z, 0, 0, 1);
 }
 
 void MainView::setScale(int scale)
@@ -237,11 +252,13 @@ void MainView::setScale(int scale)
     qreal s = (qreal) scale;
 
     s = s / 100.0;
+    this->scale = s;
 
     printf("scaling by %f\n", s);
 
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
+    rotate(xRotation, yRotation, zRotation);
     cubeMatrix.scale(s);
     pyramidMatrix.scale(s);
     update();

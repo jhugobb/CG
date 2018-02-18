@@ -31,6 +31,10 @@ public:
     QMatrix4x4 cubeMatrix;
     QMatrix4x4 pyramidMatrix;
     QMatrix4x4 projMatrix = QMatrix4x4();
+    qreal xRotation = 0;
+    qreal yRotation = 0;
+    qreal zRotation = 0;
+    qreal scale = 1;
     GLint modelShaderTransform;
     GLint projLocation;
 
@@ -44,6 +48,7 @@ public:
 
     // Functions for widget input events
     void setRotation(int rotateX, int rotateY, int rotateZ);
+    void rotate(qreal x, qreal y, qreal z);
     void setScale(int scale);
     void setShadingMode(ShadingMode shading);
 
