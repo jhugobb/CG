@@ -26,7 +26,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     originPyramidM.translate(-2, 0, -6);
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
-    projMatrix.perspective(60, 1, 0, 0);
+    projMatrix.perspective(60, 1, -1, 1);
 
 }
 
@@ -205,7 +205,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
     // TODO: Update projection to fit the new aspect ratio
     //identity?
     projMatrix.setToIdentity();
-    projMatrix.perspective(60, newWidth / newHeight, 0, -100);
+    projMatrix.perspective(60, newWidth / newHeight, -1, 1);
     update();
 
 }
@@ -215,7 +215,14 @@ void MainView::resizeGL(int newWidth, int newHeight)
 void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 {
     qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << "," << rotateZ << ")";
-    Q_UNIMPLEMENTED();
+
+    cubeMatrix = QMatrix4x4(originCubeM);
+    pyramidMatrix = QMatrix4x4(originPyramidM);
+
+    qreal x = ((qreal) rotateX) / 360;
+
+    cubeMatrix.rotate(10, x, rotateY, rotateZ);
+    update();
 }
 
 void MainView::setScale(int scale)
