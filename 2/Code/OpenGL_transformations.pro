@@ -24,7 +24,8 @@ HEADERS  += mainwindow.h \
     vertex.h \
     triangle.h \
     square.h \
-    cube.h
+    cube.h \
+    pyramid.h
 
 FORMS    += mainwindow.ui
 

@@ -13,8 +13,9 @@ struct Triangle{
     Triangle(){
     }
 
-    Vertex * toVArray(){
-        return v;
+    void toVArray(Vertex ve[3]){
+        for(int i = 0 ; i < 3 ; i++)
+            ve[i] = v[i];
     }
 };
 

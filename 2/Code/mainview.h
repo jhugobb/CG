@@ -23,8 +23,8 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QOpenGLShaderProgram shaderProgram;
 
 public:
-    GLuint vbo;
-    GLuint vao;
+    GLuint vbo[2]; //[cube, pyramid]
+    GLuint vao[2]; //[cube, pyramid]
     QOpenGLShaderProgram p;
     QMatrix4x4 cubeMatrix = QMatrix4x4();
     QMatrix4x4 pyramidMatrix = QMatrix4x4();

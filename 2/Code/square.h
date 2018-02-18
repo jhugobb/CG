@@ -25,17 +25,8 @@ struct Square {
     }
 
     void toVArray(Vertex v[6]){
-        Vertex *vt1, *vt2;
-        vt1 = t[0].toVArray();
-        vt2 = t[1].toVArray();
-
-        int i;
-        for(i = 0 ; i < 3 ; i++) {
-            v[i] = vt1[i];
-        }
-        for(i = 0 ; i < 3 ; i++) {
-            v[i + 3] = vt2[i];
-        }
+        t[0].toVArray(v);
+        t[1].toVArray(v + 3);
     }
 };
 

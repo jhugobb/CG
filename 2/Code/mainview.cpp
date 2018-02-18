@@ -3,7 +3,7 @@
 #include "vertex.h"
 #include "square.h"
 #include "cube.h"
-
+#include "pyramid.h"
 #include <QDateTime>
 
 /**
@@ -13,6 +13,7 @@
  *
  * @param parent
  */
+
 MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
 
     qDebug() << "MainView constructor";
@@ -20,8 +21,8 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
 
     //making the matrix initial transformations
-    cubeMatrix.translate(2, 0 , -6);
-    pyramidMatrix.translate(-2, 0, -6);
+    cubeMatrix.translate(-2, 0 , -6);
+    pyramidMatrix.translate(2, 0, -6);
     projMatrix.perspective(60, 800.0/600.0, 5, -30);
 
 }
@@ -80,6 +81,12 @@ void MainView::initializeGL() {
 
     createShaderProgram();
 
+    // Generating the OpenGL Objects
+    glGenBuffers(2, vbo);
+    glGenVertexArrays(2, vao);
+
+
+    //Drawing the cube
     //creating 8 vertices for the cube
     Vertex v[8];
     v[0] = Vertex(1, 1, -1, 1, 0, 0);
@@ -92,32 +99,14 @@ void MainView::initializeGL() {
     v[7] = Vertex(1, -1, 1, 1, 0, 0);
     Cube cube = Cube(v);
 
-    /*
-    // Initializing the shader programs
-    p.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vertshader.glsl");
-    p.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fragshader.glsl");
-    p.link();
-    p.bind();
-    */
-
-    // Generating the OpenGL Objects
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
-
-
     // Sending the cube to the GPU (filling the vbo)
     Vertex c[36];
     cube.toVArray(c); //DO NOT FORGET TO DESTROY
 
+    glBindVertexArray(vao[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_DYNAMIC_DRAW);
 
-    /*for(int i = 0 ; i < 36 ; i++){
-        printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
-    }*/
-
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_STATIC_DRAW);
     // Telling the GPU how the data has been layed out
     GLsizei size = sizeof(Vertex);
 
@@ -126,6 +115,34 @@ void MainView::initializeGL() {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
 
+    /*
+    //Creating the pyramid
+    Vertex v2[5];
+    v2[0] = Vertex(0, 1, 0, 0, 0, 1);
+    v2[1] = Vertex(1, 1, 1, 0, 1, 0);
+    v2[2] = Vertex(-1, 1, 1, 1, 0, 0);
+    v2[3] = Vertex(1, 1, -1, 1, 0, 0);
+    v2[4] = Vertex(-1, 1, -1, 0, 1, 0);
+
+    Pyramid pyr = Pyramid(v2);
+
+    //Sending the pyramid to the gpu
+    Vertex p[18];
+    pyr.toVArray(p);
+
+    glBindVertexArray(vao[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
+    */
+
+    /*for(int i = 0 ; i < 36 ; i++){
+        printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
+    }*/
 }
 
 void MainView::createShaderProgram()
@@ -178,6 +195,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
 {
     // TODO: Update projection to fit the new aspect ratio
     //identity?
+    projMatrix.setToIdentity();
     projMatrix.perspective(60, newWidth / newHeight, 5, -30);
     update();
 
