@@ -26,8 +26,10 @@ public:
     GLuint vbo[2]; //[cube, pyramid]
     GLuint vao[2]; //[cube, pyramid]
     QOpenGLShaderProgram p;
-    QMatrix4x4 cubeMatrix = QMatrix4x4();
-    QMatrix4x4 pyramidMatrix = QMatrix4x4();
+    QMatrix4x4 originCubeM = QMatrix4x4();
+    QMatrix4x4 originPyramidM = QMatrix4x4();
+    QMatrix4x4 cubeMatrix;
+    QMatrix4x4 pyramidMatrix;
     QMatrix4x4 projMatrix = QMatrix4x4();
     GLint modelShaderTransform;
     GLint projLocation;

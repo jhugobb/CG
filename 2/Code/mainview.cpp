@@ -5,6 +5,7 @@
 #include "cube.h"
 #include "pyramid.h"
 #include <QDateTime>
+#include <QMatrix4x4>
 
 /**
  * @brief MainView::MainView
@@ -19,11 +20,13 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     qDebug() << "MainView constructor";
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
-
     //making the matrix initial transformations
-    cubeMatrix.translate(-2, 0 , -6);
-    pyramidMatrix.translate(2, 0, -6);
-    projMatrix.perspective(60, 800.0/600.0, 5, -30);
+
+    originCubeM.translate(2, 0 , -6);
+    originPyramidM.translate(-2, 0, -6);
+    cubeMatrix = QMatrix4x4(originCubeM);
+    pyramidMatrix = QMatrix4x4(originPyramidM);
+    projMatrix.perspective(60, 1, 0, 0);
 
 }
 
@@ -89,14 +92,14 @@ void MainView::initializeGL() {
     //Drawing the cube
     //creating 8 vertices for the cube
     Vertex v[8];
-    v[0] = Vertex(-1, -1, 1, 0, 1, 0);
-    v[1] = Vertex(1, -1, 1, 0, 0, 1);
-    v[2] = Vertex(1, 1, 1, 0, 1, 0);
-    v[3] = Vertex(-1, 1, 1, 0, 0, 1);
-    v[4] = Vertex(-1, -1, -1, 1, 0, 0);
-    v[5] = Vertex(-1, 1, -1, 1, 0, 0);
-    v[6] = Vertex(1, 1, -1, 1, 0, 0);
-    v[7] = Vertex(1, -1, -1, 1, 0, 0);
+    v[0] = Vertex(-1, -1, 1, 1, 0, 0);
+    v[1] = Vertex(1, -1, 1, 0, 1, 0);
+    v[2] = Vertex(1, 1, 1, 0, 0, 1);
+    v[3] = Vertex(-1, 1, 1, 1, 1, 0);
+    v[4] = Vertex(-1, -1, -1, 1, 0, 1);
+    v[5] = Vertex(-1, 1, -1, 0, 1, 1);
+    v[6] = Vertex(1, 1, -1, 1, 0, 1);
+    v[7] = Vertex(1, -1, -1, 1, 1, 1);
     Cube cube = Cube(v);
 
     // Sending the cube to the GPU (filling the vbo)
@@ -118,11 +121,11 @@ void MainView::initializeGL() {
 
     //Creating the pyramid
     Vertex v2[5];
-    v2[0] = Vertex(0, 1, 0, 0, 0, 1);
+    v2[0] = Vertex(0, 1, 0, 1, 1, 1);
     v2[1] = Vertex(-1, -1, 1, 1, 0, 0);
     v2[2] = Vertex(1, -1, 1, 0, 1, 0);
-    v2[3] = Vertex(1, -1, -1, 0, 1, 0);
-    v2[4] = Vertex(-1, -1, -1, 1, 0, 0);
+    v2[3] = Vertex(1, -1, -1, 0, 0, 1);
+    v2[4] = Vertex(-1, -1, -1, 1, 0, 1);
 
     Pyramid pyr = Pyramid(v2);
 
@@ -202,7 +205,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
     // TODO: Update projection to fit the new aspect ratio
     //identity?
     projMatrix.setToIdentity();
-    projMatrix.perspective(60, newWidth / newHeight, 5, -30);
+    projMatrix.perspective(60, newWidth / newHeight, 0, -100);
     update();
 
 }
@@ -218,7 +221,18 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 void MainView::setScale(int scale)
 {
     qDebug() << "Scale changed to " << scale;
-    Q_UNIMPLEMENTED();
+
+    qreal s = (qreal) scale;
+
+    s = s / 100.0;
+
+    printf("scaling by %f\n", s);
+
+    cubeMatrix = QMatrix4x4(originCubeM);
+    pyramidMatrix = QMatrix4x4(originPyramidM);
+    cubeMatrix.scale(s);
+    pyramidMatrix.scale(s);
+    update();
 }
 
 void MainView::setShadingMode(ShadingMode shading)
