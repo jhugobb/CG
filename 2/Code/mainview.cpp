@@ -18,6 +18,12 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     qDebug() << "MainView constructor";
 
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
+
+    //making the matrix initial transformations
+    cubeMatrix.translate(2, 0 , -6);
+    pyramidMatrix.translate(-2, 0, -6);
+    projMatrix.perspective(60, 800.0/600.0, 5, -30);
+
 }
 
 /**
@@ -101,7 +107,7 @@ void MainView::initializeGL() {
 
     // Sending the cube to the GPU (filling the vbo)
     Vertex c[36];
-    cube.toVArray(c);
+    cube.toVArray(c); //DO NOT FORGET TO DESTROY
 
 
     /*for(int i = 0 ; i < 36 ; i++){
@@ -112,19 +118,13 @@ void MainView::initializeGL() {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_STATIC_DRAW);
-
-    // Telling the GPU the data has been layed out
+    // Telling the GPU how the data has been layed out
     GLsizei size = sizeof(Vertex);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
-
-    //making the matrix initial transformations
-    cubeMatrix.translate(2, 0 , -6);
-    pyramidMatrix.translate(-2, 0, -6);
-    projMatrix.perspective(60, 1, 3, 3);
 
 }
 
@@ -156,7 +156,10 @@ void MainView::paintGL() {
 
     shaderProgram.bind();
 
-    glUniformMatrix4fv();
+    //Sending the matrixes to the shader
+    glUniformMatrix4fv(cubeLocation, 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
+    glUniformMatrix4fv(projLocation, 1, GL_FALSE, (GLfloat *) projMatrix.data());
+
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -174,8 +177,10 @@ void MainView::paintGL() {
 void MainView::resizeGL(int newWidth, int newHeight) 
 {
     // TODO: Update projection to fit the new aspect ratio
-    Q_UNUSED(newWidth)
-    Q_UNUSED(newHeight)
+    //identity?
+    projMatrix.perspective(60, newWidth / newHeight, 5, -30);
+    update();
+
 }
 
 // --- Public interface
