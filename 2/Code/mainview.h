@@ -29,8 +29,7 @@ public:
     QMatrix4x4 cubeMatrix = QMatrix4x4();
     QMatrix4x4 pyramidMatrix = QMatrix4x4();
     QMatrix4x4 projMatrix = QMatrix4x4();
-    GLint cubeLocation;
-    GLint pyramidLocation;
+    GLint modelShaderTransform;
     GLint projLocation;
 
     enum ShadingMode : GLuint

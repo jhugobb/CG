@@ -89,14 +89,14 @@ void MainView::initializeGL() {
     //Drawing the cube
     //creating 8 vertices for the cube
     Vertex v[8];
-    v[0] = Vertex(1, 1, -1, 1, 0, 0);
-    v[1] = Vertex(-1, 1, -1, 0, 0, 1);
-    v[2] = Vertex(-1, -1, -1, 0, 1, 0);
-    v[3] = Vertex(1, -1, -1, 1, 0, 0);
-    v[4] = Vertex(1, 1, 1, 1, 0, 0);
-    v[5] = Vertex(-1, 1, 1, 0, 0, 1);
-    v[6] = Vertex(-1, -1, 1, 0, 1, 0);
-    v[7] = Vertex(1, -1, 1, 1, 0, 0);
+    v[0] = Vertex(-1, -1, 1, 0, 1, 0);
+    v[1] = Vertex(1, -1, 1, 0, 0, 1);
+    v[2] = Vertex(1, 1, 1, 0, 1, 0);
+    v[3] = Vertex(-1, 1, 1, 0, 0, 1);
+    v[4] = Vertex(-1, -1, -1, 1, 0, 0);
+    v[5] = Vertex(-1, 1, -1, 1, 0, 0);
+    v[6] = Vertex(1, 1, -1, 1, 0, 0);
+    v[7] = Vertex(1, -1, -1, 1, 0, 0);
     Cube cube = Cube(v);
 
     // Sending the cube to the GPU (filling the vbo)
@@ -108,8 +108,8 @@ void MainView::initializeGL() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_DYNAMIC_DRAW);
 
     // Telling the GPU how the data has been layed out
-    GLsizei size = sizeof(Vertex);
 
+    GLsizei size = sizeof(Vertex);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
@@ -119,10 +119,10 @@ void MainView::initializeGL() {
     //Creating the pyramid
     Vertex v2[5];
     v2[0] = Vertex(0, 1, 0, 0, 0, 1);
-    v2[1] = Vertex(1, 1, 1, 0, 1, 0);
-    v2[2] = Vertex(-1, 1, 1, 1, 0, 0);
-    v2[3] = Vertex(1, 1, -1, 1, 0, 0);
-    v2[4] = Vertex(-1, 1, -1, 0, 1, 0);
+    v2[1] = Vertex(-1, -1, 1, 1, 0, 0);
+    v2[2] = Vertex(1, -1, 1, 0, 1, 0);
+    v2[3] = Vertex(1, -1, -1, 0, 1, 0);
+    v2[4] = Vertex(-1, -1, -1, 1, 0, 0);
 
     Pyramid pyr = Pyramid(v2);
 
@@ -137,7 +137,7 @@ void MainView::initializeGL() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
 
     /*for(int i = 0 ; i < 36 ; i++){
         printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
@@ -153,8 +153,7 @@ void MainView::createShaderProgram()
                                            ":/shaders/fragshader.glsl");
     shaderProgram.link();
 
-    cubeLocation = shaderProgram.uniformLocation("cubeTransform");
-    pyramidLocation = shaderProgram.uniformLocation("pyramidTransform");
+    modelShaderTransform = shaderProgram.uniformLocation("modelTransform");
     projLocation = shaderProgram.uniformLocation("projTransform");
 }
 
@@ -172,12 +171,20 @@ void MainView::paintGL() {
 
     shaderProgram.bind();
 
-    //Sending the matrixes to the shader
-    glUniformMatrix4fv(cubeLocation, 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, (GLfloat *) projMatrix.data());
 
+    //draw
 
+    //cube
+    glBindVertexArray(vao[0]);
+    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    //pyramid
+    glBindVertexArray(vao[1]);
+    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
+    glDrawArrays(GL_TRIANGLES, 0, 18);
+
 
     shaderProgram.release();
 }

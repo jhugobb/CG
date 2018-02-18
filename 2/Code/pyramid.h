@@ -19,7 +19,8 @@ struct Pyramid {
         tr[2] = Triangle(t3);
         tr[3] = Triangle(t4);
 
-        sq = Square(v + 1);
+        Vertex baseV[4] = {v[4], v[3], v[2], v[1]};
+        sq = Square(baseV);
     }
 
     void toVArray(Vertex v[18]){

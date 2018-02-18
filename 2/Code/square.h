@@ -12,7 +12,11 @@ struct Square {
         t[1] = t2;
     }
 
-    Square (Vertex v[4]) { //receives 4 vertexes
+    /**
+     * @brief Square
+     * @param v Receives 4 vertexes that must be in clock-wise order
+     */
+    Square (Vertex v[4]) {
         Vertex tmp1[3] = {v[0], v[1], v[2]};
         Vertex tmp2[3] = {v[2], v[3], v[0]};
 
