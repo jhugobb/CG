@@ -20,6 +20,6 @@ void main()
 {
     // gl_Position is the output (a vec4) of the vertex shader
     // Currently without any transformation
-    gl_Position = projTransform * cubeTransform * vec4(vertCoordinates_in, 1.0);
+    gl_Position = /*projTransform * cubeTransform * */vec4(vertCoordinates_in, 1.0);
     vertColor = vertColor_in;
 }

@@ -115,7 +115,7 @@ void MainView::initializeGL() {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
 
-    /*
+
     //Creating the pyramid
     Vertex v2[5];
     v2[0] = Vertex(0, 1, 0, 0, 0, 1);
@@ -138,7 +138,6 @@ void MainView::initializeGL() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
-    */
 
     /*for(int i = 0 ; i < 36 ; i++){
         printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
