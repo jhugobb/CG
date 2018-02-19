@@ -25,7 +25,6 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
     GLuint vbo[3]; //[cube, pyramid]
     GLuint vao[3]; //[cube, pyramid]
-    QOpenGLShaderProgram p;
     QMatrix4x4 originCubeM = QMatrix4x4();
     QMatrix4x4 originPyramidM = QMatrix4x4();
     QMatrix4x4 originModelM = QMatrix4x4();

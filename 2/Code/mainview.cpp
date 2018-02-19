@@ -43,6 +43,14 @@ MainView::~MainView() {
     debugLogger->stopLogging();
 
     qDebug() << "MainView destructor";
+
+    //cleaning everything
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    shaderProgram.removeAllShaders();
+    shaderProgram.release();
+    glDeleteBuffers(3, vbo);
+    glDeleteVertexArrays(3, vao);
 }
 
 /**
