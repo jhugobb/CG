@@ -65,6 +65,66 @@ float getXLength (Vertex *v, int N) {
     return (max - min);
 }
 
+/**
+ * @brief getYLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Y Length
+ */
+float getYLength (Vertex *v, int N) {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < N ; i++) {
+        if (v[i].coord[1] < min) {
+            min = v[i].coord[1];
+        }
+        else if (v[i].coord[1] > max) {
+            max = v[i].coord[1];
+        }
+
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getZLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Z Length
+ */
+float getZLength (Vertex *v, int N) {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < N ; i++) {
+        if (v[i].coord[2] < min) {
+            min = v[i].coord[2];
+        }
+        else if (v[i].coord[2] > max) {
+            max = v[i].coord[2];
+        }
+
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getMaxLength Returns the greatest length from the 3 axis perspective of a model.
+ * @param v Model.
+ * @param N Number of vertexes.
+ * @return Greatest length.
+ */
+float getMaxLength (Vertex *v, int N) {
+    float max = getXLength(v, N), tmp;
+
+    if ((tmp = getYLength(v, N)) > max) {
+        max = tmp;
+    }
+
+    if ((tmp = getZLength(v, N)) > max) {
+        max = tmp;
+    }
+
+    return max;
+}
+
 
 // --- OpenGL initialization
 
@@ -155,6 +215,8 @@ void MainView::initializeGL() {
     Vertex p[18];
     pyr.toVArray(p);
 
+
+
     glBindVertexArray(vao[1]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
@@ -180,14 +242,16 @@ void MainView::initializeGL() {
         i++;
     }
 
-    //Scaling of the imported model in order for it to have the same lenght (with the X axis as reference) as the the cube and the pyramide (i.e.: 2)
-    originModelM.scale(1.0 / getXLength(vv, modelSize));
+    //Scaling of the imported model in order for it to fit in a unit cube automatically
+    originModelM.scale(1.0 / getMaxLength(vv, modelSize));
     modelMatrix = QMatrix4x4(originModelM);
 
+    //Buffering the model
     glBindVertexArray(vao[2]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
 
+    //Sending layout info
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
