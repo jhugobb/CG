@@ -215,9 +215,6 @@ void MainView::initializeGL() {
     Vertex p[18];
     pyr.toVArray(p);
 
-    qDebug() << getMaxLength(p, 18);
-
-
     glBindVertexArray(vao[1]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
@@ -375,8 +372,6 @@ void MainView::setScale(int scale)
 
     s = s / 100.0;
     this->scale = s;
-
-    printf("scaling by %f\n", s);
 
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
