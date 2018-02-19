@@ -4,6 +4,7 @@
 #include "triangle.h"
 
 struct Square {
+    //The square is composed out of 2 triangles
     Triangle t[2];
 
     Square (Triangle t1, Triangle t2) {

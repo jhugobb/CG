@@ -2,7 +2,7 @@
 #define MAINVIEW_H
 
 #include "model.h"
-
+#include "vertex.h"
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QOpenGLWidget>
@@ -23,13 +23,15 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QOpenGLShaderProgram shaderProgram;
 
 public:
-    GLuint vbo[2]; //[cube, pyramid]
-    GLuint vao[2]; //[cube, pyramid]
+    GLuint vbo[3]; //[cube, pyramid]
+    GLuint vao[3]; //[cube, pyramid]
     QOpenGLShaderProgram p;
     QMatrix4x4 originCubeM = QMatrix4x4();
     QMatrix4x4 originPyramidM = QMatrix4x4();
+    QMatrix4x4 originModelM = QMatrix4x4();
     QMatrix4x4 cubeMatrix;
     QMatrix4x4 pyramidMatrix;
+    QMatrix4x4 modelMatrix;
     QMatrix4x4 projMatrix = QMatrix4x4();
     qreal xRotation = 0;
     qreal yRotation = 0;
@@ -37,6 +39,8 @@ public:
     qreal scale = 1;
     GLint modelShaderTransform;
     GLint projLocation;
+    int modelSize;
+
 
     enum ShadingMode : GLuint
     {
@@ -46,9 +50,10 @@ public:
     MainView(QWidget *parent = 0);
     ~MainView();
 
+    void rotate(qreal x, qreal y, qreal z);
+
     // Functions for widget input events
     void setRotation(int rotateX, int rotateY, int rotateZ);
-    void rotate(qreal x, qreal y, qreal z);
     void setScale(int scale);
     void setShadingMode(ShadingMode shading);
 

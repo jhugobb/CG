@@ -24,10 +24,11 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
 
     originCubeM.translate(2, 0 , -6);
     originPyramidM.translate(-2, 0, -6);
+    originModelM.translate(0, 0, -6);
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
+    modelMatrix = QMatrix4x4(originModelM);
     projMatrix.perspective(60, 1, -1, 1);
-
 }
 
 /**
@@ -43,6 +44,27 @@ MainView::~MainView() {
 
     qDebug() << "MainView destructor";
 }
+
+/**
+ * @brief getXLength Calculates the length of the element (assuming the vertexes composes an element) from the X axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return X Length
+ */
+float getXLength (Vertex *v, int N) {
+    float min = std::numeric_limits<float>::max(), max = - std::numeric_limits<float>::max();
+    for(int i = 0 ; i < N ; i++) {
+        if (v[i].coord[0] < min) {
+            min = v[i].coord[0];
+        }
+        else if (v[i].coord[0] > max) {
+            max = v[i].coord[0];
+        }
+
+    }
+    return (max - min);
+}
+
 
 // --- OpenGL initialization
 
@@ -85,8 +107,8 @@ void MainView::initializeGL() {
     createShaderProgram();
 
     // Generating the OpenGL Objects
-    glGenBuffers(2, vbo);
-    glGenVertexArrays(2, vao);
+    glGenBuffers(3, vbo);
+    glGenVertexArrays(3, vao);
 
 
     //Drawing the cube
@@ -142,9 +164,34 @@ void MainView::initializeGL() {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
 
-    /*for(int i = 0 ; i < 36 ; i++){
-        printf("(%f, %f, %f) (%f, %f, %f)\n", c[i].coord[0], c[i].coord[1], c[i].coord[2], c[i].color[0], c[i].color[1], c[i].color[2]);
-    }*/
+    Model m = Model(":/models/sphere.obj");
+
+    QVector<QVector3D> vm = m.getVertices();
+    modelSize = vm.size();
+    Vertex vv[modelSize];
+    int i = 0;
+    float r,g,b;
+    for (QVector3D vert : vm) {
+        //Random values calculator for the colours
+        r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        vv[i] = Vertex(vert.x(), vert.y(), vert.z(), r, g, b);
+        i++;
+    }
+
+    //Scaling of the imported model in order for it to have the same lenght (with the X axis as reference) as the the cube and the pyramide (i.e.: 2)
+    originModelM.scale(1.0 / getXLength(vv, modelSize));
+    modelMatrix = QMatrix4x4(originModelM);
+
+    glBindVertexArray(vao[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
 }
 
 void MainView::createShaderProgram()
@@ -188,6 +235,10 @@ void MainView::paintGL() {
     glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 18);
 
+    //model
+    glBindVertexArray(vao[2]);
+    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) modelMatrix.data());
+    glDrawArrays(GL_TRIANGLES, 0, modelSize);
 
     shaderProgram.release();
 }
@@ -216,8 +267,10 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 {
     qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << "," << rotateZ << ")";
 
+    //reinitialization of the matrixes so that the rotation is effectively correct
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
+    modelMatrix = QMatrix4x4(originModelM);
 
     //qreal x = ((qreal) rotateX) / 360;
     xRotation = rotateX;
@@ -226,6 +279,7 @@ void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
 
     cubeMatrix.scale(scale);
     pyramidMatrix.scale(scale);
+    modelMatrix.scale(scale);
     rotate(xRotation, yRotation, zRotation);
     update();
 }
@@ -243,6 +297,9 @@ void MainView::rotate(qreal x, qreal y, qreal z) {
     pyramidMatrix.rotate(x, 1, 0, 0);
     pyramidMatrix.rotate(y, 0, 1, 0);
     pyramidMatrix.rotate(z, 0, 0, 1);
+    modelMatrix.rotate(x, 1, 0, 0);
+    modelMatrix.rotate(y, 0, 1, 0);
+    modelMatrix.rotate(z, 0, 0, 1);
 }
 
 void MainView::setScale(int scale)
@@ -258,9 +315,11 @@ void MainView::setScale(int scale)
 
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
+    modelMatrix = QMatrix4x4(originModelM);
     rotate(xRotation, yRotation, zRotation);
     cubeMatrix.scale(s);
     pyramidMatrix.scale(s);
+    modelMatrix.scale(s);
     update();
 }
 

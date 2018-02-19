@@ -2,6 +2,7 @@
 #define PYRAMID_H
 
 struct Pyramid {
+    //The pyramid is composed out of one square and 4 triangles.
     Square sq;
     Triangle tr[4];
 

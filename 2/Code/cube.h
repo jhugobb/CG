@@ -3,6 +3,8 @@
 #include "square.h"
 
 struct Cube {
+
+    //The cube is composed out of 6 squares
     Square sq[6];
 
     /**
