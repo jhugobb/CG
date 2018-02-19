@@ -24,7 +24,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
 
     originCubeM.translate(2, 0 , -6);
     originPyramidM.translate(-2, 0, -6);
-    originModelM.translate(0, 0, -6);
+    originModelM.translate(0, 0, -10);
     cubeMatrix = QMatrix4x4(originCubeM);
     pyramidMatrix = QMatrix4x4(originPyramidM);
     modelMatrix = QMatrix4x4(originModelM);
@@ -215,6 +215,7 @@ void MainView::initializeGL() {
     Vertex p[18];
     pyr.toVArray(p);
 
+    qDebug() << getMaxLength(p, 18);
 
 
     glBindVertexArray(vao[1]);
@@ -243,7 +244,7 @@ void MainView::initializeGL() {
     }
 
     //Scaling of the imported model in order for it to fit in a unit cube automatically
-    originModelM.scale(1.0 / getMaxLength(vv, modelSize));
+    originModelM.scale(2.0 / getMaxLength(vv, modelSize));
     modelMatrix = QMatrix4x4(originModelM);
 
     //Buffering the model
