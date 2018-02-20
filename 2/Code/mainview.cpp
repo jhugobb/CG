@@ -194,7 +194,7 @@ void MainView::initializeGL() {
 
     // Sending the cube to the GPU (filling the vbo)
     Vertex c[36];
-    cube.toVArray(c); //DO NOT FORGET TO DESTROY
+    cube.toVArray(c);
 
     glBindVertexArray(vao[0]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
@@ -232,6 +232,7 @@ void MainView::initializeGL() {
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
 
+    // Defining the object model
     Model m = Model(":/models/sphere.obj");
 
     QVector<QVector3D> vm = m.getVertices();
@@ -323,8 +324,6 @@ void MainView::paintGL() {
  */
 void MainView::resizeGL(int newWidth, int newHeight) 
 {
-    // TODO: Update projection to fit the new aspect ratio
-    //identity?
     projMatrix.setToIdentity();
     projMatrix.perspective(60, newWidth / newHeight, -1, 1);
     update();
