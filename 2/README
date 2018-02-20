@@ -1,35 +1,8 @@
-Drawing the shapes
+This is a README file
 
-The first part of the assignment was the most difficult one. We opted for creating
-structs that would facilitate defining the pyramid and the cube. Then, using VAOs
-and VBOs we loaded the information of the cube, pyramid and sphere model. On paintGL
-we drew the shapes taking advantage of the VAOs with glDrawArrays.
+When submitting your assignment, describe (briefly) the changes you made and what difficulties you encountered in this file.
 
-Applying transformations
+Also describe what controls (key short-cuts, mouse clicks, mouse movement etc) and possible bonus assignments you implemented, so we can check them more easily.
 
-We have 7 matrixes. 2 for each shape and 1 for the perscpective. We need to have 2
-for each shape to correctly apply scaling and rotation, in order to before scaling/rotating
-the shapes getting the matrix back to its original position (stored matrix). Also we keep
-the current scaling and rotation in class variables to when applying a new scale not changing
-the rotation. These matrixes are initializated in the Mainview constructor and changed accordingly
-whenever user input changes the values.
+If you have any suggestions/feedback for improving the practical assignments or support from teaching assistants, you may include it here OR post in anonymously on Nestor under Feedback.
 
-The shader
-
-We used 2 uniforms in the shader, one for the model transformation and one for the projection.
-Before drawing a shape, we tell the GPU that the uniform of the transformation is the one
-that corresponds with the shape we want to draw.
-
-User instructions
-
-To run the program in Qt, just click the Run button. Aftwards one can rotate and scale at will
-using the Qt Widgets.
-To change between models in the program, go to line 236 and change "sphere.obj" to one of the .obj
-in the resources file.
-
-Final Comments
-
-We believe that the first part was the hardest one, for we had to have in mind the counter-clockwise
-definition of the triangles and at the same time have a visualization in our heads of the shapes to
-define the triangles. In all, we believe that we had a very good performance, just falling short on
-the indexed drawing that we wanted to achieve.
