@@ -50,9 +50,21 @@ Color Scene::trace(Ray const &ray)
     *        Color * Color      dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
-    double ID = max(0.0, N.dot(V)) * material.kd;
+    Color IA, ID, IS;
+    IA = ID = IS = Color();
+    Vector L, R;
+    for (int i = 0 ; i < lights.size() ; i++) {
+        L = (lights[i]->position - hit).normalized();
+        ID += max(0.0, L.dot(N)) * lights[i]->color;
+        R = 2 * (L.dot(N)) * N - L;
+        IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
+    }
+    IA = material.color * material.ka;
+    ID = ID * material.color * material.kd;
+    IS = IS * material.ks;
 
-    Color color = R.dot(V) * material.color ;                  // place holder
+    //double ID = max(0.0, N.dot(V)) * material.kd;
+    Color color = IA + ID + IS;                  // place holder
 
     return color;
 }

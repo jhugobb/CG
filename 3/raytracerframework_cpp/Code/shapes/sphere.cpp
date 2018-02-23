@@ -4,10 +4,6 @@
 
 using namespace std;
 
-bool solveQuadratic(double a, double b, double c, double *x0, double *x1) 
-{ 
-} 
-
 Hit Sphere::intersect(Ray const &ray)
 {
     /****************************************************
