@@ -32,7 +32,7 @@ Hit Sphere::intersect(Ray const &ray)
     if (tca < 0) {
         return Hit::NO_HIT();
     }
-    double d2 = 1.0 - tca * tca;
+    double d2 = OC.dot(OC) - tca * tca; //Why doesn't this work with "1 - tca^2"
     if(d2 < 0) {
         return Hit::NO_HIT();
     }
@@ -58,8 +58,9 @@ Hit Sphere::intersect(Ray const &ray)
     *
     * Insert calculation of the sphere's normal at the intersection point.
     ****************************************************/
+    Point p = ray.O + t * ray.D;
 
-    Vector N /* = ... */;
+    Vector N = (p - position).normalized();
 
     return Hit(t,N);
 }

@@ -50,8 +50,9 @@ Color Scene::trace(Ray const &ray)
     *        Color * Color      dito
     *        pow(a,b)           a to the power of b
     ****************************************************/
+    double ID = max(0.0, N.dot(V)) * material.kd;
 
-    Color color = material.color;                  // place holder
+    Color color = R.dot(V) * material.color ;                  // place holder
 
     return color;
 }
