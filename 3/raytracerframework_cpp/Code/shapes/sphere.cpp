@@ -4,6 +4,10 @@
 
 using namespace std;
 
+bool solveQuadratic(double a, double b, double c, double *x0, double *x1) 
+{ 
+} 
+
 Hit Sphere::intersect(Ray const &ray)
 {
     /****************************************************
@@ -23,13 +27,29 @@ Hit Sphere::intersect(Ray const &ray)
     ****************************************************/
 
     // place holder for actual intersection calculation
-
-    Vector OC = (position - ray.O).normalized();
-    if (OC.dot(ray.D) < 0.999) {
+    Vector OC = (position - ray.O);
+    double tca = OC.dot(ray.D);
+    if (tca < 0) {
         return Hit::NO_HIT();
     }
-    double t = 1000;
+    double d2 = 1.0 - tca * tca;
+    if(d2 < 0) {
+        return Hit::NO_HIT();
+    }
+    double thc = sqrt(r*r - d2);
+    double t0 = tca - thc;
+    double t1 = tca + thc;
 
+    if (t0 > t1) {
+        swap(t0, t1);
+    }
+    if (t0 < 0) {
+        t0 = t1;
+        if (t0 < 0) {
+            return Hit::NO_HIT();
+        }
+    }
+    double t = t0;
     /****************************************************
     * RT1.2: NORMAL CALCULATION
     *
