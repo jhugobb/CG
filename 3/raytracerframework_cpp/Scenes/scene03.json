@@ -1,0 +1,43 @@
+{
+    "Eye": [200, 200, 1000],
+    "Lights": [
+        {
+            "position": [-200, 600, 1500],
+            "color": [1.0, 1.0, 1.0]
+        }
+    ],
+    "Objects": [
+        {
+            "type": "sphere",
+            "comment": "Blue sphere",
+            "position": [200, 180, 500],
+            "radius": 50,
+            "material":
+            {
+                "color": [0.75, 0.5, 0.0],
+                "ka": 0.5,
+                "kd": 0.3,
+                "ks": 1,
+                "n": 20
+            }
+        },
+        {
+            "type": "triangle",
+            "comment": "Red triangle",
+            "points": 
+            {
+                "a": [200, 180, 600],
+                "b": [100, 120, 300],
+                "c": [300, 130, 500]
+            },
+            "material":
+            {
+                "color": [1, 1, 1],
+                "ka": 0.2,
+                "kd": 0.7,
+                "ks": 0.5,
+                "n": 63
+            }
+        }
+    ]
+}
