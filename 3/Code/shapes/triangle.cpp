@@ -1,5 +1,6 @@
 #include "triangle.h"
 #include "../solveQ.h"
+#include "../vertex.h"
 
 #include <cmath>
 

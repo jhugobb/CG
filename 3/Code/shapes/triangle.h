@@ -2,6 +2,7 @@
 #define TRIANGLE_H_
 
 #include "../object.h"
+#include "../vertex.h"
 
 class Triangle : public Object
 {

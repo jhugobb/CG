@@ -11,6 +11,8 @@
 
 #include "shapes/sphere.h"
 #include "shapes/triangle.h"
+#include "shapes/plane.h"
+#include "objloader.h"
 
 // =============================================================================
 // -- End of shape includes ----------------------------------------------------
@@ -43,6 +45,11 @@ bool Raytracer::parseObjectNode(json const &node)
         Point v2(node["v2"]);
         Point v3(node["v3"]);
         obj = ObjectPtr(new Triangle(v1, v2, v3));
+    }
+    else if (node["type"] == "plane") {
+        Point p0(node["p0"]);
+        Triple N(node["normal"]);
+        obj = ObjectPtr(new Plane(p0, N));
     } else {
             cerr << "Unknown object type: " << node["type"] << ".\n";
     }
@@ -94,9 +101,31 @@ try
     scene.setEye(eye);
 
     // TODO: add your other configuration settings here
-
+    ObjectPtr obj = nullptr;
+    
     for (auto const &lightNode : jsonscene["Lights"])
         scene.addLight(parseLightNode(lightNode));
+
+    for (auto const &meshNode : jsonscene["Meshes"]) {
+        const string s = meshNode["model"];
+        OBJLoader objLoader = OBJLoader(s);
+        vector<Vertex> vv = objLoader.vertex_data();
+        for (unsigned int i = 0; i < vv.size(); i += 3){
+            cout << vv[i].x << endl;
+            Point p[3];
+            Point translation(meshNode["translation"]);
+            double scale(meshNode["scale"]);
+            for (unsigned int j = 0; j < 3; j++){
+                p[j].x = vv[i+j].x * scale + translation.x;
+                p[j].y = vv[i+j].y * scale + translation.y;
+                p[j].z = vv[i+j].z * scale + translation.z;
+            }
+            Triangle *t = new Triangle(p[0], p[1], p[2]);
+            obj = ObjectPtr(t);
+            obj->material = parseMaterialNode(meshNode["material"]);
+            scene.addObject(obj);
+        }
+    }
 
     unsigned objCount = 0;
     for (auto const &objectNode : jsonscene["Objects"])
