@@ -74,6 +74,7 @@ class Triple
         // NOTE: normalized return a COPY, normalize does NOT
         Triple normalized() const;              // normalized COPY
         void normalize();                       // normalize THIS
+        double angle(Vector v);
 
 // --- Color functions ---------------------------------------------------------
 

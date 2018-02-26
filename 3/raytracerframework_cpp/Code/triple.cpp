@@ -164,6 +164,13 @@ void Triple::normalize()
     z *= invlen;
 }
 
+double Triple::angle(Vector v) {
+    double d = this->dot(v);
+    double magnitude = this->length() * v.length();
+
+    return (d / magnitude);
+}
+
 // --- Color functions ---------------------------------------------------------
 
 void Triple::set(double f)

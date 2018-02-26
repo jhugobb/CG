@@ -3,6 +3,7 @@
 #include <cmath>
 
 using namespace std;
+constexpr float kEpsilon = 1e-8;
 
 Hit Triangle::intersect(Ray const &ray) {
     //MT algorithm
@@ -12,7 +13,7 @@ Hit Triangle::intersect(Ray const &ray) {
     Vector pV = ray.D.cross(AC);
     double det = AB.dot(pV);
     
-    if (det < 0) {
+    if (det < kEpsilon) {
         return Hit::NO_HIT();
     }
 
@@ -36,10 +37,9 @@ Hit Triangle::intersect(Ray const &ray) {
     return Hit(t, AB.cross(AC));
 }
 
-
 Triangle::Triangle(Point const &pA, Point const &pB, Point const &pC)
-:
-    pointA(pA),
-    pointB(pB),
-    pointC(pC)
-{}
+    : pointA(pA),
+      pointB(pB),
+      pointC(pC)
+{
+}

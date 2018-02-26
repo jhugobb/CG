@@ -11,6 +11,7 @@
 
 #include "shapes/sphere.h"
 #include "shapes/triangle.h"
+#include "shapes/quad.h"
 
 // =============================================================================
 // -- End of shape includes ----------------------------------------------------
@@ -46,6 +47,15 @@ bool Raytracer::parseObjectNode(json const &node)
         Point pointB(points["b"]);
         Point pointC(points["c"]);
         obj = ObjectPtr(new Triangle(pointA, pointB, pointC));
+    }
+    else if (node["type"] == "quad")
+    {
+        json points = node["points"];
+        Point pointA(points["a"]);
+        Point pointB(points["b"]);
+        Point pointC(points["c"]);
+        Point pointD(points["d"]);
+        obj = ObjectPtr(new Quad(pointA, pointB, pointC, pointD));
     }
     else
     {
