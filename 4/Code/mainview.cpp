@@ -50,7 +50,6 @@ void MainView::turnPyramidToOriginal () {
 void MainView::turnModelToOriginal () {
     modelMatrix = QMatrix4x4();
     modelMatrix.translate(0, 0, -10);
-    modelMatrix.scale(modelScale);
 }
 
 /**
