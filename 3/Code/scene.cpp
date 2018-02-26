@@ -34,32 +34,37 @@ Color Scene::trace(Ray const &ray)
     Vector V = -ray.D;                             //the view vector
 
     /****************************************************
-    * This is where you should insert the color
-    * calculation (Phong model).
-    *
-    * Given: material, hit, N, V, lights[]
-    * Sought: color
-    *
-    * Hints: (see triple.h)
-    *        Triple.dot(Vector) dot product
-    *        Vector + Vector    vector sum
-    *        Vector - Vector    vector difference
-    *        Point - Point      yields vector
-    *        Vector.normalize() normalizes vector, returns length
-    *        double * Color     scales each color component (r,g,b)
-    *        Color * Color      dito
-    *        pow(a,b)           a to the power of b
-    ****************************************************/
-    float id, is = id = 0;
-    Color color = Color();
-    for (unsigned int i=0; i<lights.size(); i++) {
-        Vector L = (lights[i]->position - hit).normalized();
-        id = material.kd * max(0.0, N.dot(L));
-        Vector R = 2 * (L.dot(N)) * N - L;
-        is = material.ks * pow(max(0.0, R.dot(V)), material.n);
-        color += lights[i]->color * is;
+     * This is where you should insert the color
+     * calculation (Phong model).
+     *
+     * Given: material, hit, N, V, lights[]
+     * Sought: color
+     *
+     * Hints: (see triple.h)
+     *        Triple.dot(Vector) dot product
+     *        Vector + Vector    vector sum
+     *        Vector - Vector    vector difference
+     *        Point - Point      yields vector
+     *        Vector.normalize() normalizes vector, returns length
+     *        double * Color     scales each color component (r,g,b)
+     *        Color * Color      dito
+     *        pow(a,b)           a to the power of b
+     ****************************************************/
+    Color IA, ID, IS;
+    IA = ID = IS = Color();
+    Vector L, R;
+    for (int i = 0 ; i < lights.size() ; i++) {
+        L = (lights[i]->position - hit).normalized();
+        ID += max(0.0, L.dot(N)) * lights[i]->color;
+        R = 2 * (L.dot(N)) * N - L;
+        IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
     }
-    color = color + (material.ka + id) * material.color;
+    IA = material.color * material.ka;
+    ID = ID * material.color * material.kd;
+    IS = IS * material.ks;
+
+    //double ID = max(0.0, N.dot(V)) * material.kd;
+    Color color = IA + ID + IS; 
     return color;
 }
 
@@ -67,7 +72,7 @@ void Scene::render(Image &img)
 {
     unsigned w = img.width();
     unsigned h = img.height();
-    #pragma omp parallel for
+#pragma omp parallel for
     for (unsigned y = 0; y < h; ++y)
     {
         for (unsigned x = 0; x < w; ++x)

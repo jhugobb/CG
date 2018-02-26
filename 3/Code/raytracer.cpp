@@ -41,10 +41,11 @@ bool Raytracer::parseObjectNode(json const &node)
         double radius = node["radius"];
         obj = ObjectPtr(new Sphere(pos, radius));
     } else if (node["type"] == "triangle") {
-        Point v1(node["v1"]);
-        Point v2(node["v2"]);
-        Point v3(node["v3"]);
-        obj = ObjectPtr(new Triangle(v1, v2, v3));
+        json points = node["points"];
+        Point pointA(points["a"]);
+        Point pointB(points["b"]);
+        Point pointC(points["c"]);
+        obj = ObjectPtr(new Triangle(pointA, pointB, pointC));
     }
     else if (node["type"] == "plane") {
         Point p0(node["p0"]);
