@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <limits>
 
 using namespace std;
 
@@ -77,8 +78,6 @@ bool OBJLoader::hasTexCoords() const
 
 void OBJLoader::unitize()
 {
-    // TODO: implement this yourself!
-
     // This is a very handy function for importing models
     // which you may reuse in other projects.
     // You may have noticed you can use arbitrary sizes for your
@@ -98,11 +97,111 @@ void OBJLoader::unitize()
     //  all dimensions!)
     // Loop over all coordinate data and scale the coordinates
     //  and apply the translate/scaling
+    vector<Vertex> v = this->vertex_data();
+    unsigned int size = v.size();
+    double scale = 2.0 / getMaxLength(v, static_cast <double> (size));
 
-    cerr << "unitize() is not implemented!\n";
+    #pragma omp parallel for 
+    for (unsigned int i = 0; i < size; i++) {
+        v[i].x *= scale;
+        v[i].y *= scale;
+        v[i].z *= scale;
+    }
+
 }
 
 // --- Private -------------------------------------------------------
+/**
+ * @brief getXLength Calculates the length of the element (assuming the vertexes composes an element) from the X axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return X Length
+ */
+float OBJLoader::getXLength(vector<Vertex> v, int N)
+{
+    float min = std::numeric_limits<float>::max(), max = -std::numeric_limits<float>::max();
+    for (int i = 0; i < N; i++)
+    {
+        if (v[i].x < min)
+        {
+            min = v[i].x;
+        }
+        else if (v[i].x > max)
+        {
+            max = v[i].x;
+        }
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getYLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Y Length
+ */
+float OBJLoader::getYLength(vector<Vertex> v, int N)
+{
+    float min = std::numeric_limits<float>::max(), max = -std::numeric_limits<float>::max();
+    for (int i = 0; i < N; i++)
+    {
+        if (v[i].y < min)
+        {
+            min = v[i].y;
+        }
+        else if (v[i].y > max)
+        {
+            max = v[i].y;
+        }
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getZLength Calculates the length of the element (assuming the vertexes composes an element) from the Z axis perspective.
+ * @param v Vertexes
+ * @param N Number of vertexes
+ * @return Z Length
+ */
+float OBJLoader::getZLength(vector<Vertex> v, int N)
+{
+    float min = std::numeric_limits<float>::max(), max = -std::numeric_limits<float>::max();
+    for (int i = 0; i < N; i++)
+    {
+        if (v[i].z < min)
+        {
+            min = v[i].z;
+        }
+        else if (v[i].z > max)
+        {
+            max = v[i].z;
+        }
+    }
+    return (max - min);
+}
+
+/**
+ * @brief getMaxLength Returns the greatest length from the 3 axis perspective of a model.
+ * @param v Model.
+ * @param N Number of vertexes.
+ * @return Greatest length.
+ */
+float OBJLoader::getMaxLength(vector<Vertex> v, int N)
+{
+    float max = getXLength(v, N), tmp;
+
+    if ((tmp = getYLength(v, N)) > max)
+    {
+        max = tmp;
+    }
+
+    if ((tmp = getZLength(v, N)) > max)
+    {
+        max = tmp;
+    }
+
+    return max;
+}
 
 void OBJLoader::parseFile(string const &filename)
 {

@@ -105,13 +105,15 @@ try
     
     for (auto const &lightNode : jsonscene["Lights"])
         scene.addLight(parseLightNode(lightNode));
+    
+    unsigned objCount = 0;
 
     for (auto const &meshNode : jsonscene["Meshes"]) {
         const string s = meshNode["model"];
         OBJLoader objLoader = OBJLoader(s);
+        objLoader.unitize();
         vector<Vertex> vv = objLoader.vertex_data();
         for (unsigned int i = 0; i < vv.size(); i += 3){
-            cout << vv[i].x << endl;
             Point p[3];
             Point translation(meshNode["translation"]);
             double scale(meshNode["scale"]);
@@ -125,9 +127,9 @@ try
             obj->material = parseMaterialNode(meshNode["material"]);
             scene.addObject(obj);
         }
+        ++objCount;
     }
 
-    unsigned objCount = 0;
     for (auto const &objectNode : jsonscene["Objects"])
         if (parseObjectNode(objectNode))
             ++objCount;

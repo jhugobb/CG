@@ -33,7 +33,6 @@ Hit Triangle::intersect(Ray const &ray)
     if (v < 0.0 || u + v > 1.0)
         return Hit::NO_HIT();
 
-    // At this stage we can compute t to find out where the intersection point is on the line.
     float t = f * edge2.dot(q);
     if (t > kEpsilon) // ray intersection
     {   

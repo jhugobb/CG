@@ -78,6 +78,10 @@ class OBJLoader
 
     private:
 
+        float getXLength(std::vector<Vertex> v, int N);
+        float getYLength(std::vector<Vertex> v, int N);
+        float getZLength(std::vector<Vertex> v, int N);
+        float getMaxLength(std::vector<Vertex> v, int N);
         void parseFile(std::string const &filename);
         void parseLine(std::string const &line);
         void parseVertex(StringList const &tokens);
