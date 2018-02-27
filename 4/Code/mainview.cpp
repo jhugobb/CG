@@ -24,7 +24,7 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     turnCubeToOriginal();
     turnPyramidToOriginal();
     turnModelToOriginal();
-    projMatrix.perspective(60, 1, 0, 100);
+    projMatrix.perspective(60, 1, 0.01, 100);
 }
 
 /**
@@ -50,6 +50,7 @@ void MainView::turnPyramidToOriginal () {
 void MainView::turnModelToOriginal () {
     modelMatrix = QMatrix4x4();
     modelMatrix.translate(0, 0, -10);
+    modelMatrix.scale(modelScale);
 }
 
 /**
@@ -119,7 +120,9 @@ void MainView::initializeGL() {
     glGenBuffers(3, vbo);
     glGenVertexArrays(3, vao);
 
+    GLsizei size = sizeof(Vertex);
 
+    /*
     //Drawing the cube
     //creating 8 vertices for the cube
     Vertex v[8];
@@ -135,15 +138,14 @@ void MainView::initializeGL() {
 
     // Sending the cube to the GPU (filling the vbo)
     Vertex c[36];
-    cube.toVArray(c); //DO NOT FORGET TO DESTROY
+    cube.toVArray(c);
 
-    glBindVertexArray(vao[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBindVertexArray(vao[MODELINDEX::CUBE]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::CUBE]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_DYNAMIC_DRAW);
 
     // Telling the GPU how the data has been layed out
 
-    GLsizei size = sizeof(Vertex);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
@@ -164,7 +166,7 @@ void MainView::initializeGL() {
     Vertex p[18];
     pyr.toVArray(p);
 
-    glBindVertexArray(vao[1]);
+    glBindVertexArray(vao[MODELINDEX::PYRAMID]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::PYRAMID]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
 
@@ -172,8 +174,9 @@ void MainView::initializeGL() {
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
+    */
 
-    Model m = Model(":/models/sphere.obj");
+    Model m = Model(":/models/cat.obj");
     m.unitize();
 
     QVector<QVector3D> vm = m.getVertices();
@@ -185,7 +188,7 @@ void MainView::initializeGL() {
     }
 
     //Buffering the model
-    glBindVertexArray(vao[2]);
+    glBindVertexArray(vao[MODELINDEX::MODEL]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::MODEL]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
 
@@ -200,13 +203,14 @@ void MainView::createShaderProgram()
 {
     // Create shader program
     shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                           ":/shaders/vertshader.glsl");
+                                           ":/shaders/vertshader_normal.glsl");
     shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                           ":/shaders/fragshader.glsl");
+                                           ":/shaders/fragshader_normal.glsl");
     shaderProgram.link();
 
     modelShaderTransform = shaderProgram.uniformLocation("modelTransform");
     projLocation = shaderProgram.uniformLocation("projTransform");
+    normalLocation = shaderProgram.uniformLocation("normalTransform");
 }
 
 // --- OpenGL drawing
@@ -224,21 +228,22 @@ void MainView::paintGL() {
     shaderProgram.bind();
 
     glUniformMatrix4fv(projLocation, 1, GL_FALSE, (GLfloat *) projMatrix.data());
+    glUniformMatrix3fv(normalLocation, 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
 
     //draw
 
     //cube
-    glBindVertexArray(vao[0]);
+    glBindVertexArray(vao[MODELINDEX::CUBE]);
     glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //pyramid
-    glBindVertexArray(vao[1]);
+    glBindVertexArray(vao[MODELINDEX::PYRAMID]);
     glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 18);
 
     //model
-    glBindVertexArray(vao[2]);
+    glBindVertexArray(vao[MODELINDEX::MODEL]);
     glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) modelMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, modelSize);
 
@@ -258,7 +263,7 @@ void MainView::resizeGL(int newWidth, int newHeight)
     float ratio = ((float) newWidth) / ((float) newHeight);
 
     projMatrix.setToIdentity();
-    projMatrix.perspective(60, ratio, 0, 100);
+    projMatrix.perspective(60, ratio, 0.01, 100);
     update();
 
 }

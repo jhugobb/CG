@@ -1,8 +1,2 @@
-This is a README file
-
-When submitting your assignment, describe (briefly) the changes you made and what difficulties you encountered in this file.
-
-Also describe what controls (key short-cuts, mouse clicks, mouse movement etc) and possible bonus assignments you implemented, so we can check them more easily.
-
-If you have any suggestions/feedback for improving the practical assignments or support from teaching assistants, you may include it here OR post in anonymously on Nestor under Feedback.
-
+Normal shader:
+    -When not using the normal transformation matrix, the colors will be static from the model reference (i.e.: if the model is the cat, it's back will always be green independently from the scaling/rotation, because according to the model vertexes, it's back will be where the normals are closer to the (0, 1, 0) vector). When using the normal transformation matrix, the colors will be relative the transformations that ocurred to the model, therefore, the upper parts of the model (from our prespective) will always be green. In the case of the sphere, you nearly can't notice when it is rotating.
