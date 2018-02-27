@@ -20,7 +20,6 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QOpenGLDebugLogger *debugLogger;
     QTimer timer; // timer used for animation
 
-    QOpenGLShaderProgram shaderProgram;
 
 public:
     enum MODELINDEX
@@ -42,16 +41,19 @@ public:
     qreal yRotation = 0;
     qreal zRotation = 0;
     qreal scale = 1;
-    GLint modelShaderTransform;
-    GLint projLocation;
-    GLint normalLocation;
     int modelSize;
 
 
     enum ShadingMode : GLuint
     {
-        PHONG = 0, NORMAL, GOURAUD
+        PHONG = 0, NORMAL, GOURAUD, COUNTSHADER
     };
+
+    QOpenGLShaderProgram shaderProgram[ShadingMode::COUNTSHADER];
+    GLint modelShaderTransform[ShadingMode::COUNTSHADER];
+    GLint projLocation[ShadingMode::COUNTSHADER];
+    GLint normalLocation[ShadingMode::COUNTSHADER];
+    GLuint currentShade;
 
     MainView(QWidget *parent = 0);
     ~MainView();

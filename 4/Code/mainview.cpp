@@ -69,8 +69,12 @@ MainView::~MainView() {
     //cleaning everything
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    shaderProgram.removeAllShaders();
-    shaderProgram.release();
+    shaderProgram[ShadingMode::NORMAL].removeAllShaders();
+    shaderProgram[ShadingMode::NORMAL].release();
+    shaderProgram[ShadingMode::PHONG].removeAllShaders();
+    shaderProgram[ShadingMode::PHONG].release();
+    shaderProgram[ShadingMode::GOURAUD].removeAllShaders();
+    shaderProgram[ShadingMode::GOURAUD].release();
     glDeleteBuffers(3, vbo);
     glDeleteVertexArrays(3, vao);
 }
@@ -201,16 +205,41 @@ void MainView::initializeGL() {
 
 void MainView::createShaderProgram()
 {
-    // Create shader program
-    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Vertex,
+    //NORMAL
+    shaderProgram[ShadingMode::NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                            ":/shaders/vertshader_normal.glsl");
-    shaderProgram.addShaderFromSourceFile(QOpenGLShader::Fragment,
+    shaderProgram[ShadingMode::NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_normal.glsl");
-    shaderProgram.link();
+    shaderProgram[ShadingMode::NORMAL].link();
 
-    modelShaderTransform = shaderProgram.uniformLocation("modelTransform");
-    projLocation = shaderProgram.uniformLocation("projTransform");
-    normalLocation = shaderProgram.uniformLocation("normalTransform");
+    modelShaderTransform[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("modelTransform");
+    projLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("projTransform");
+    normalLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("normalTransform");
+
+    //PHONG
+
+    shaderProgram[ShadingMode::PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                           ":/shaders/vertshader_phong.glsl");
+    shaderProgram[ShadingMode::PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                           ":/shaders/fragshader_phong.glsl");
+    shaderProgram[ShadingMode::PHONG].link();
+
+    modelShaderTransform[ShadingMode::PHONG]= shaderProgram[ShadingMode::PHONG].uniformLocation("modelTransform");
+    projLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("projTransform");
+    normalLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("normalTransform");
+
+    //GOURAUD
+
+    shaderProgram[ShadingMode::GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                           ":/shaders/vertshader_gouraud.glsl");
+    shaderProgram[ShadingMode::GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                           ":/shaders/fragshader_gouraud.glsl");
+    shaderProgram[ShadingMode::GOURAUD].link();
+
+    modelShaderTransform[ShadingMode::GOURAUD]= shaderProgram[ShadingMode::GOURAUD].uniformLocation("modelTransform");
+    projLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("projTransform");
+    normalLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("normalTransform");
+
 }
 
 // --- OpenGL drawing
@@ -225,29 +254,29 @@ void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    shaderProgram.bind();
+    shaderProgram[currentShade].bind();
 
-    glUniformMatrix4fv(projLocation, 1, GL_FALSE, (GLfloat *) projMatrix.data());
-    glUniformMatrix3fv(normalLocation, 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
+    glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
+    glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
 
     //draw
 
     //cube
     glBindVertexArray(vao[MODELINDEX::CUBE]);
-    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
+    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //pyramid
     glBindVertexArray(vao[MODELINDEX::PYRAMID]);
-    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
+    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, 18);
 
     //model
     glBindVertexArray(vao[MODELINDEX::MODEL]);
-    glUniformMatrix4fv(modelShaderTransform, 1, GL_FALSE, (GLfloat *) modelMatrix.data());
+    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, modelSize);
 
-    shaderProgram.release();
+    shaderProgram[currentShade].release();
 }
 
 /**
@@ -330,8 +359,7 @@ void MainView::setScale(int scale)
 
 void MainView::setShadingMode(ShadingMode shading)
 {
-    qDebug() << "Changed shading to" << shading;
-    Q_UNIMPLEMENTED();
+    currentShade = shading;
 }
 
 // --- Private helpers
