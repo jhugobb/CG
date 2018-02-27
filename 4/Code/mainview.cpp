@@ -215,6 +215,7 @@ void MainView::createShaderProgram()
     modelShaderTransform[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("modelTransform");
     projLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("projTransform");
     normalLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("normalTransform");
+    lightPosition[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("lightPosition");
 
     //PHONG
 
@@ -227,6 +228,7 @@ void MainView::createShaderProgram()
     modelShaderTransform[ShadingMode::PHONG]= shaderProgram[ShadingMode::PHONG].uniformLocation("modelTransform");
     projLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("projTransform");
     normalLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("normalTransform");
+    lightPosition[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("lightPosition");
 
     //GOURAUD
 
@@ -239,6 +241,7 @@ void MainView::createShaderProgram()
     modelShaderTransform[ShadingMode::GOURAUD]= shaderProgram[ShadingMode::GOURAUD].uniformLocation("modelTransform");
     projLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("projTransform");
     normalLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("normalTransform");
+    lightPosition[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("lightPosition");
 
 }
 
@@ -253,11 +256,13 @@ void MainView::createShaderProgram()
 void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    double light[3] = {20, 60, 150};
 
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
     glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
+    glUniform3fv(lightPosition[currentShade], 1, (GLfloat *) light);
 
     //draw
 
