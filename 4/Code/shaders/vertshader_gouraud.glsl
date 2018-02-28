@@ -18,12 +18,12 @@ out vec3 vertColor;
 
 void main()
 {
-    vec3 lightPosition = vec3(modelTransform * vec4(100.0, 100.0, 150.0, 1.0));
-    float material[4] = float[4](0.5, 0.5, 0.5, 20);
     // gl_Position is the output (a vec4) of the vertex shader
     // Currently without any transformation
     gl_Position = projTransform * modelTransform * vec4(vertCoordinates_in, 1.0);
 
+    vec3 lightPosition = vec3(modelTransform * vec4(100.0, 100.0, 150.0, 1.0));
+    float material[4] = float[4](0.5, 0.5, 0.5, 20);
 
     vec3 N = normalize(normalTransform * vertNormal_in);
     vec3 materialColor, lightColor;

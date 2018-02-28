@@ -15,11 +15,15 @@ uniform mat3 normalTransform;
 
 // Specify the output of the vertex stage
 out vec3 vertNormal;
+out vec3 vertCoor;
 
 void main()
 {
     // gl_Position is the output (a vec4) of the vertex shader
     // Currently without any transformation
     gl_Position = projTransform * modelTransform * vec4(vertCoordinates_in, 1.0);
+
+    vertCoor = vertCoordinates_in;
+
     vertNormal = normalTransform * vertNormal_in;
 }
