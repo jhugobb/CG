@@ -53,7 +53,6 @@ public:
     GLint modelShaderTransform[ShadingMode::COUNTSHADER];
     GLint projLocation[ShadingMode::COUNTSHADER];
     GLint normalLocation[ShadingMode::COUNTSHADER];
-    GLint lightPosition[ShadingMode::COUNTSHADER];
     GLuint currentShade;
 
     MainView(QWidget *parent = 0);
