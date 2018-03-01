@@ -43,6 +43,8 @@ public:
     qreal scale = 1;
     int modelSize;
 
+    GLuint texture;
+
 
     enum ShadingMode : GLuint
     {
@@ -53,6 +55,7 @@ public:
     GLint modelShaderTransform[ShadingMode::COUNTSHADER];
     GLint projLocation[ShadingMode::COUNTSHADER];
     GLint normalLocation[ShadingMode::COUNTSHADER];
+    GLint samplerLocation[2];
     GLuint currentShade;
 
     MainView(QWidget *parent = 0);
@@ -67,6 +70,7 @@ public:
     void setRotation(int rotateX, int rotateY, int rotateZ);
     void setScale(int scale);
     void setShadingMode(ShadingMode shading);
+    void loadTexture(QString file, GLuint texturePtr);
 
 protected:
     void initializeGL();

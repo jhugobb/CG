@@ -6,6 +6,7 @@
 // Specify the input locations of attributes
 layout (location = 0) in vec3 vertCoordinates_in;
 layout (location = 1) in vec3 vertNormal_in;
+layout (location = 2) in vec2 textureCoords_in;
 
 // Specify the Uniforms of the vertex shader
 uniform mat4 modelTransform;
@@ -15,6 +16,7 @@ uniform mat3 normalTransform;
 
 // Specify the output of the vertex stage
 out vec3 vertColor;
+out vec2 textureCoords;
 
 void main()
 {
@@ -22,8 +24,9 @@ void main()
     // Currently without any transformation
     gl_Position = projTransform * modelTransform * vec4(vertCoordinates_in, 1.0);
 
-    vec3 lightPosition = vec3(modelTransform * vec4(100.0, 100.0, 150.0, 1.0));
-    float material[4] = float[4](0.5, 0.5, 0.5, 20);
+    vec4 light = modelTransform * vec4(100.0, 100.0, 150.0, 1.0);
+    vec3 lightPosition = vec3(light/light.w);
+    float material[4] = float[4](0.2, 0.8, 0.0, 1);
 
     vec3 N = normalize(normalTransform * vertNormal_in);
     vec3 materialColor, lightColor;
@@ -39,4 +42,6 @@ void main()
     IS = (pow(max(0.0, dot(R, 0 - vertCoordinates_in)), material[3]) * lightColor) * material[2]; //0 - vertCoor because we are in the origin of the reference
 
     vertColor = IA + ID + IS;
+
+    textureCoords = textureCoords_in;
 }
