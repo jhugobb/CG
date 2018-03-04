@@ -53,9 +53,20 @@ void MainView::turnModelToOriginal () {
     modelMatrix.scale(modelScale);
 }
 
+/**
+ * @brief MainView::loadTexture
+ *
+ * Loads the texture in the path "file"
+ */
 void MainView::loadTexture(QString file, GLuint texturePtr) {
+    GLfloat f;
     QVector<quint8> img = imageToBytes(QImage(file));
     glBindTexture(GL_TEXTURE_2D, texturePtr);
+
+    // Anisotropic Filtering
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &f);
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAX_ANISOTROPY_EXT,f);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -67,7 +78,7 @@ void MainView::loadTexture(QString file, GLuint texturePtr) {
  *
  * Destructor of MainView
  * This is the last function called, before exit of the program
- * Use this to clean up your variables, buffers etc.
+ * Used to clean up variables, buffers etc.
  *
  */
 MainView::~MainView() {
@@ -78,15 +89,15 @@ MainView::~MainView() {
     //cleaning everything
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    shaderProgram[ShadingMode::NORMAL].removeAllShaders();
-    shaderProgram[ShadingMode::NORMAL].release();
-    shaderProgram[ShadingMode::PHONG].removeAllShaders();
-    shaderProgram[ShadingMode::PHONG].release();
-    shaderProgram[ShadingMode::GOURAUD].removeAllShaders();
-    shaderProgram[ShadingMode::GOURAUD].release();
-    glDeleteBuffers(3, vbo);
-    glDeleteVertexArrays(3, vao);
-    glDeleteTextures(1, &texture);
+    shaderProgram[NORMAL].removeAllShaders();
+    shaderProgram[NORMAL].release();
+    shaderProgram[PHONG].removeAllShaders();
+    shaderProgram[PHONG].release();
+    shaderProgram[GOURAUD].removeAllShaders();
+    shaderProgram[GOURAUD].release();
+    glDeleteBuffers(COUNT, vbo);
+    glDeleteVertexArrays(COUNT, vao);
+    glDeleteTextures(COUNT, texture);
 }
 
 
@@ -131,69 +142,15 @@ void MainView::initializeGL() {
     createShaderProgram();
 
     // Generating the OpenGL Objects
-    glGenBuffers(3, vbo);
-    glGenVertexArrays(3, vao);
-    glGenTextures(1, &texture);
+    glGenBuffers(COUNT, vbo);
+    glGenVertexArrays(COUNT, vao);
+    glGenTextures(COUNT, texture);
 
     GLsizei size = sizeof(Vertex);
 
-    /*
-    //Drawing the cube
-    //creating 8 vertices for the cube
-    Vertex v[8];
-    v[0] = Vertex(-1, -1, 1, 1, 0, 0);
-    v[1] = Vertex(1, -1, 1, 0, 1, 0);
-    v[2] = Vertex(1, 1, 1, 0, 0, 1);
-    v[3] = Vertex(-1, 1, 1, 1, 1, 0);
-    v[4] = Vertex(-1, -1, -1, 1, 0, 1);
-    v[5] = Vertex(-1, 1, -1, 0, 1, 1);
-    v[6] = Vertex(1, 1, -1, 1, 0, 1);
-    v[7] = Vertex(1, -1, -1, 1, 1, 1);
-    Cube cube = Cube(v);
-
-    // Sending the cube to the GPU (filling the vbo)
-    Vertex c[36];
-    cube.toVArray(c);
-
-    glBindVertexArray(vao[MODELINDEX::CUBE]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::CUBE]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Cube), c, GL_DYNAMIC_DRAW);
-
-    // Telling the GPU how the data has been layed out
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(float)*3));
-
-
-    //Creating the pyramid
-    Vertex v2[5];
-    v2[0] = Vertex(0, 1, 0, 1, 1, 1);
-    v2[1] = Vertex(-1, -1, 1, 1, 0, 0);
-    v2[2] = Vertex(1, -1, 1, 0, 1, 0);
-    v2[3] = Vertex(1, -1, -1, 0, 0, 1);
-    v2[4] = Vertex(-1, -1, -1, 1, 0, 1);
-
-    Pyramid pyr = Pyramid(v2);
-
-    //Sending the pyramid to the gpu
-    Vertex p[18];
-    pyr.toVArray(p);
-
-    glBindVertexArray(vao[MODELINDEX::PYRAMID]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::PYRAMID]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Pyramid), p, GL_DYNAMIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
-    */
-
     Model m = Model(":/models/cat.obj");
     m.unitize();
-    loadTexture(":/textures/cat_diff.png", texture);
+    loadTexture(":/textures/cat_diff.png", texture[MODEL]);
     QVector<QVector3D> vm = m.getVertices();
     modelSize = vm.size();
     Vertex vv[modelSize];
@@ -206,8 +163,8 @@ void MainView::initializeGL() {
 
 
     //Buffering the model
-    glBindVertexArray(vao[MODELINDEX::MODEL]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODELINDEX::MODEL]);
+    glBindVertexArray(vao[MODEL]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODEL]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
 
     //Sending layout info
@@ -222,41 +179,41 @@ void MainView::initializeGL() {
 void MainView::createShaderProgram()
 {
     //NORMAL
-    shaderProgram[ShadingMode::NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
+    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                            ":/shaders/vertshader_normal.glsl");
-    shaderProgram[ShadingMode::NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
+    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_normal.glsl");
-    shaderProgram[ShadingMode::NORMAL].link();
+    shaderProgram[NORMAL].link();
 
-    modelShaderTransform[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("modelTransform");
-    projLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("projTransform");
-    normalLocation[ShadingMode::NORMAL] = shaderProgram[ShadingMode::NORMAL].uniformLocation("normalTransform");
+    modelShaderTransform[NORMAL] = shaderProgram[NORMAL].uniformLocation("modelTransform");
+    projLocation[NORMAL] = shaderProgram[NORMAL].uniformLocation("projTransform");
+    normalLocation[NORMAL] = shaderProgram[NORMAL].uniformLocation("normalTransform");
 
     //PHONG
 
-    shaderProgram[ShadingMode::PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
+    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                            ":/shaders/vertshader_phong.glsl");
-    shaderProgram[ShadingMode::PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
+    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_phong.glsl");
-    shaderProgram[ShadingMode::PHONG].link();
+    shaderProgram[PHONG].link();
 
-    modelShaderTransform[ShadingMode::PHONG]= shaderProgram[ShadingMode::PHONG].uniformLocation("modelTransform");
-    projLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("projTransform");
-    normalLocation[ShadingMode::PHONG] = shaderProgram[ShadingMode::PHONG].uniformLocation("normalTransform");
-    samplerLocation[0] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("samplerUniform");
+    modelShaderTransform[PHONG]= shaderProgram[PHONG].uniformLocation("modelTransform");
+    projLocation[PHONG] = shaderProgram[PHONG].uniformLocation("projTransform");
+    normalLocation[PHONG] = shaderProgram[PHONG].uniformLocation("normalTransform");
+    samplerLocation[0] = shaderProgram[GOURAUD].uniformLocation("samplerUniform");
 
     //GOURAUD
 
-    shaderProgram[ShadingMode::GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
+    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                            ":/shaders/vertshader_gouraud.glsl");
-    shaderProgram[ShadingMode::GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
+    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_gouraud.glsl");
-    shaderProgram[ShadingMode::GOURAUD].link();
+    shaderProgram[GOURAUD].link();
 
-    modelShaderTransform[ShadingMode::GOURAUD]= shaderProgram[ShadingMode::GOURAUD].uniformLocation("modelTransform");
-    projLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("projTransform");
-    normalLocation[ShadingMode::GOURAUD] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("normalTransform");
-    samplerLocation[1] = shaderProgram[ShadingMode::GOURAUD].uniformLocation("samplerUniform");
+    modelShaderTransform[GOURAUD]= shaderProgram[GOURAUD].uniformLocation("modelTransform");
+    projLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("projTransform");
+    normalLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("normalTransform");
+    samplerLocation[1] = shaderProgram[GOURAUD].uniformLocation("samplerUniform");
 
 }
 
@@ -272,35 +229,23 @@ void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
     glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
 
+    //draw
+
+    //model
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture[MODEL]);
     if(currentShade == PHONG)
         glUniform1i(samplerLocation[0], 0);
     if(currentShade == GOURAUD)
         glUniform1i(samplerLocation[1], 0);
-    //draw
 
-    /*
-    //cube
-    glBindVertexArray(vao[MODELINDEX::CUBE]);
-    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) cubeMatrix.data());
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-
-    //pyramid
-    glBindVertexArray(vao[MODELINDEX::PYRAMID]);
-    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) pyramidMatrix.data());
-    glDrawArrays(GL_TRIANGLES, 0, 18);
-    */
-
-    //model
-    glBindVertexArray(vao[MODELINDEX::MODEL]);
+    glBindVertexArray(vao[MODEL]);
     glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.data());
     glDrawArrays(GL_TRIANGLES, 0, modelSize);
 

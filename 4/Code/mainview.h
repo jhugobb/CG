@@ -24,14 +24,14 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
     enum MODELINDEX
     {
-        CUBE = 0,
-        PYRAMID,
-        MODEL,
+        MODEL = 0,
         COUNT
     };
 
-    GLuint vbo[MODELINDEX::COUNT]; //[cube, pyramid, model]
-    GLuint vao[MODELINDEX::COUNT]; //[cube, pyramid, model]
+    GLuint vbo[MODELINDEX::COUNT]; // [model]
+    GLuint vao[MODELINDEX::COUNT]; // [model]
+    GLuint texture[MODELINDEX::COUNT]; // [model]
+
     QMatrix4x4 cubeMatrix;
     QMatrix4x4 pyramidMatrix;
     QMatrix4x4 modelMatrix;
@@ -43,18 +43,15 @@ public:
     qreal scale = 1;
     int modelSize;
 
-    GLuint texture;
-
-
     enum ShadingMode : GLuint
     {
         PHONG = 0, NORMAL, GOURAUD, COUNTSHADER
     };
 
-    QOpenGLShaderProgram shaderProgram[ShadingMode::COUNTSHADER];
-    GLint modelShaderTransform[ShadingMode::COUNTSHADER];
-    GLint projLocation[ShadingMode::COUNTSHADER];
-    GLint normalLocation[ShadingMode::COUNTSHADER];
+    QOpenGLShaderProgram shaderProgram[COUNTSHADER];
+    GLint modelShaderTransform[COUNTSHADER];
+    GLint projLocation[COUNTSHADER];
+    GLint normalLocation[COUNTSHADER];
     GLint samplerLocation[2];
     GLuint currentShade;
 

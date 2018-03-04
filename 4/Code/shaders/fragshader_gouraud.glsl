@@ -1,17 +1,15 @@
 #version 330 core
 
-// Define constants
-#define M_PI 3.141593
+// Constants
 
-// Specify the inputs to the fragment shader
+// Inputs to the fragment shader
 in vec3 vertColor;
 in vec2 textureCoords;
 
-// Specify the Uniforms of the fragment shaders
+//  Uniforms of the fragment shaders
 uniform sampler2D samplerUniform;
 
-// Specify the output of the fragment shader
-// Usually a vec4 describing a color (Red, Green, Blue, Alpha/Transparency)
+// Output of the fragment shader
 out vec4 fColor;
 
 void main()

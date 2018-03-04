@@ -1,6 +1,2 @@
-2/Code/OpenGL_transformations
-1/Code/OpenGL_intro.pro.user
-1/build-OpenGL_basics-Desktop_Qt_5_10_0_clang_64bit-Debug/
-1/build-OpenGL_intro-Desktop_Qt_5_10_0_clang_64bit-Debug/
-2/Code/OpenGL_transformations.pro.user.aeaef4b
-2/build-OpenGL_transformations-Desktop_Qt_5_10_0_clang_64bit-Debug/
+*/build-*
+*/Code/OpenGL_*
