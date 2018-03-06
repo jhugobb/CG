@@ -98,6 +98,10 @@ try
 // -- Read your scene data in this section -------------------------------------
 // =============================================================================
 
+    //Shadow configuration read
+    bool s(jsonscene["Shadows"]);
+    scene.setShadow(s);
+
     Point eye(jsonscene["Eye"]);
     scene.setEye(eye);
 

@@ -10,11 +10,61 @@
 
 using namespace std;
 
+Color Scene::lightTrace(const Material &material, Point hit, Vector N, Vector V, int objectID)
+{
+    Color IA, ID, IS;
+    IA = ID = IS = Color();
+    Vector L, R;
+    if (!Shadows) //if the shadows are not activated
+    {
+        for (unsigned int i = 0; i < lights.size(); i++)
+        {
+            L = (lights[i]->position - hit).normalized();
+            ID += max(0.0, L.dot(N)) * lights[i]->color;
+            R = 2 * (L.dot(N)) * N - L;
+            IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
+        }
+    }
+    else
+    { //if the shadows are activated
+        for (unsigned int i = 0; i < lights.size(); i++)
+        {
+            L = (lights[i]->position - hit).normalized();
+            double min_hit_l = (lights[i]->position - hit).length();
+            Ray lightRay = Ray(lights[i]->position, -L);
+
+            bool noShadow = true;
+            //checks if the light ray intersects any other object first
+            for (int i2 = 0; i2 < objects.size() && noShadow; i2++)
+            {
+                Hit hittmp(objects[i2]->intersect(lightRay));
+                if (i2 != objectID && hittmp.t  < min_hit_l)
+                    noShadow = false;
+            }
+
+            if (noShadow)
+            {
+                ID += max(0.0, L.dot(N)) * lights[i]->color;
+                R = 2 * (L.dot(N)) * N - L;
+                IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
+            }
+        }
+    }
+
+    IA = material.color * material.ka;
+    ID = ID * material.color * material.kd;
+    IS = IS * material.ks;
+
+    //double ID = max(0.0, N.dot(V)) * material.kd;
+    return IA + ID + IS;
+}
+
 Color Scene::trace(Ray const &ray)
 {
     // Find hit object and distance
     Hit min_hit(numeric_limits<double>::infinity(), Vector());
     ObjectPtr obj = nullptr;
+    int objID;
     for (unsigned idx = 0; idx != objects.size(); ++idx)
     {
         Hit hit(objects[idx]->intersect(ray));
@@ -22,16 +72,13 @@ Color Scene::trace(Ray const &ray)
         {
             min_hit = hit;
             obj = objects[idx];
+            objID = idx;
         }
     }
 
     // No hit? Return background color.
-    if (!obj) return Color(0.0, 0.0, 0.0);
-
-    Material material = obj->material;          //the hit objects material
-    Point hit = ray.at(min_hit.t);                 //the hit point
-    Vector N = min_hit.N;                          //the normal at hit point
-    Vector V = -ray.D;                             //the view vector
+    if (!obj)
+        return Color(0.0, 0.0, 0.0);
 
     /****************************************************
      * This is where you should insert the color
@@ -50,22 +97,12 @@ Color Scene::trace(Ray const &ray)
      *        Color * Color      dito
      *        pow(a,b)           a to the power of b
      ****************************************************/
-    Color IA, ID, IS;
-    IA = ID = IS = Color();
-    Vector L, R;
-    for (unsigned int i = 0 ; i < lights.size() ; i++) {
-        L = (lights[i]->position - hit).normalized();
-        ID += max(0.0, L.dot(N)) * lights[i]->color;
-        R = 2 * (L.dot(N)) * N - L;
-        IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
-    }
-    IA = material.color * material.ka;
-    ID = ID * material.color * material.kd;
-    IS = IS * material.ks;
+    Material material = obj->material; //the hit objects material
+    Point hit = ray.at(min_hit.t);     //the hit point
+    Vector N = min_hit.N;              //the normal at hit point
+    Vector V = -ray.D;                 //the view vector
 
-    //double ID = max(0.0, N.dot(V)) * material.kd;
-    Color color = IA + ID + IS; 
-    return color;
+    return lightTrace(material, hit, N, V, objID);
 }
 
 void Scene::render(Image &img)
@@ -111,4 +148,9 @@ unsigned Scene::getNumObject()
 unsigned Scene::getNumLights()
 {
     return lights.size();
+}
+
+void Scene::setShadow(bool s)
+{
+    Shadows = s;
 }
