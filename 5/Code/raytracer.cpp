@@ -100,6 +100,15 @@ try
 
     Point eye(jsonscene["Eye"]);
     scene.setEye(eye);
+    if (jsonscene["Shadows"] != nullptr) {
+        bool isShadowActive(jsonscene["Shadows"]);
+        scene.setShadow(isShadowActive);
+    }
+
+    if (jsonscene["MaxRecursionDepth"] != nullptr) {
+        double recursionDepth(jsonscene["MaxRecursionDepth"]);
+        scene.setRecursionDepth(recursionDepth);
+    }
 
     ObjectPtr obj = nullptr;
     

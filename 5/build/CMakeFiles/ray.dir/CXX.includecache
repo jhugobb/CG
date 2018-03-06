@@ -435,6 +435,8 @@ cmath
 -
 limits
 -
+iostream
+-
 
 /home/red/Desktop/curso/NL/CG/5/Code/scene.h
 light.h
