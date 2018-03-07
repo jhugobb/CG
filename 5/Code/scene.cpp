@@ -8,58 +8,14 @@
 #include <cmath>
 #include <limits>
 
+#define BOUNCESNR 2
 using namespace std;
 
-Color Scene::lightTrace(const Material &material, Point hit, Vector N, Vector V, int objectID)
-{
-    Color IA, ID, IS;
-    IA = ID = IS = Color();
-    Vector L, R;
-    if (!Shadows) //if the shadows are not activated
-    {
-        for (unsigned int i = 0; i < lights.size(); i++)
-        {
-            L = (lights[i]->position - hit).normalized();
-            ID += max(0.0, L.dot(N)) * lights[i]->color;
-            R = 2 * (L.dot(N)) * N - L;
-            IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
-        }
-    }
-    else
-    { //if the shadows are activated
-        for (unsigned int i = 0; i < lights.size(); i++)
-        {
-            L = (lights[i]->position - hit).normalized();
-            double min_hit_l = (lights[i]->position - hit).length();
-            Ray lightRay = Ray(lights[i]->position, -L);
-
-            bool noShadow = true;
-            //checks if the light ray intersects any other object first
-            for (int i2 = 0; i2 < objects.size() && noShadow; i2++)
-            {
-                Hit hittmp(objects[i2]->intersect(lightRay));
-                if (i2 != objectID && hittmp.t  < min_hit_l)
-                    noShadow = false;
-            }
-
-            if (noShadow)
-            {
-                ID += max(0.0, L.dot(N)) * lights[i]->color;
-                R = 2 * (L.dot(N)) * N - L;
-                IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
-            }
-        }
-    }
-
-    IA = material.color * material.ka;
-    ID = ID * material.color * material.kd;
-    IS = IS * material.ks;
-
-    //double ID = max(0.0, N.dot(V)) * material.kd;
-    return IA + ID + IS;
+Vector calculateReflection(Vector L, Vector N){
+    return 2 * (L.dot(N)) * N - L;
 }
 
-Color Scene::trace(Ray const &ray)
+Color Scene::trace(Ray const &ray, int recursionDepth)
 {
     // Find hit object and distance
     Hit min_hit(numeric_limits<double>::infinity(), Vector());
@@ -102,7 +58,47 @@ Color Scene::trace(Ray const &ray)
     Vector N = min_hit.N;              //the normal at hit point
     Vector V = -ray.D;                 //the view vector
 
-    return lightTrace(material, hit, N, V, objID);
+    Color IA, ID, IS;
+    IA = ID = IS = Color();
+    Vector L, R;
+
+    if (recursionDepth > 0) {
+        R = calculateReflection(V, N);
+        IS = trace(Ray(hit + 0.01 * R, R), recursionDepth - 1);
+    }
+
+    for (unsigned int i = 0; i < lights.size(); i++)
+    {
+        bool noShadow = true;
+        L = (lights[i]->position - hit).normalized();
+        if (SHADOWS)
+        {
+            double min_hit_l = (lights[i]->position - hit).length();
+            Ray lightRay = Ray(lights[i]->position, -L);
+
+            //checks if the light ray intersects any other object first
+            for (int i2 = 0 ; i2 < objects.size() && noShadow ; i2++)
+            {
+                Hit hittmp(objects[i2]->intersect(lightRay));
+                if (i2 != objID && hittmp.t < min_hit_l)
+                    noShadow = false;
+            }
+        }
+
+        if (noShadow)
+        {
+            ID += max(0.0, L.dot(N)) * lights[i]->color;
+            R = calculateReflection(L, N);
+            IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
+        }
+    }
+
+    IA = material.color * material.ka;
+    ID = ID * material.color * material.kd;
+    IS = IS * material.ks;
+
+    //double ID = max(0.0, N.dot(V)) * material.kd;
+    return IA + ID + IS;
 }
 
 void Scene::render(Image &img)
@@ -116,7 +112,7 @@ void Scene::render(Image &img)
         {
             Point pixel(x + 0.5, h - 1 - y + 0.5, 0);
             Ray ray(eye, (pixel - eye).normalized());
-            Color col = trace(ray);
+            Color col = trace(ray, BOUNCESNR);
             col.clamp();
             img(x, y) = col;
         }
@@ -152,5 +148,5 @@ unsigned Scene::getNumLights()
 
 void Scene::setShadow(bool s)
 {
-    Shadows = s;
+    SHADOWS = s;
 }
