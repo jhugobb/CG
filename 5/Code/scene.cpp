@@ -101,6 +101,25 @@ Color Scene::trace(Ray const &ray, int recursionDepth)
     return IA + ID + IS;
 }
 
+Color Scene::superSampling (Point pixel, int factor) {
+    Color r = Color();
+    double unit = 1.0 / (double) factor; //0.5 because it's supposed to be half of the inverse value
+    Point fstSample(pixel.x + (unit / 2), pixel.y + (unit / 2), 0); //positioning on the first sample
+    Point sample;
+
+    for (int x = 0 ; x < factor ; x++)
+    {
+        sample = fstSample + Point(x * unit, 0, 0); //positionin on the lower sample
+        for (int y = 0 ; y < factor ; y++)
+        {
+            sample = sample + Point(0, unit, 0); //going up in the y axis
+            Ray ray(eye, (sample - eye).normalized());
+            r = r + trace(ray, BOUNCESNR);
+        }
+    }
+    return r / (factor*factor);
+}
+
 void Scene::render(Image &img)
 {
     unsigned w = img.width();
@@ -110,9 +129,10 @@ void Scene::render(Image &img)
     {
         for (unsigned x = 0; x < w; ++x)
         {
-            Point pixel(x + 0.5, h - 1 - y + 0.5, 0);
-            Ray ray(eye, (pixel - eye).normalized());
-            Color col = trace(ray, BOUNCESNR);
+            Point pixel(x, h - 1 - y, 0);
+            //Ray ray(eye, (pixel - eye).normalized());
+            //Color col = trace(ray, BOUNCESNR);
+            Color col = superSampling(pixel, SuperSamplingFactor);
             col.clamp();
             img(x, y) = col;
         }
@@ -149,4 +169,9 @@ unsigned Scene::getNumLights()
 void Scene::setShadow(bool s)
 {
     SHADOWS = s;
+}
+
+void Scene::setSuperSamplingFactor(int f)
+{
+    SuperSamplingFactor = f;
 }

@@ -99,8 +99,15 @@ try
 // =============================================================================
 
     //Shadow configuration read
-    bool s(jsonscene["Shadows"]);
-    scene.setShadow(s);
+    if(jsonscene["Shadows"] != nullptr) {
+        bool s(jsonscene["Shadows"]);
+        scene.setShadow(s);
+    }
+
+    if(jsonscene["SuperSamplingFactor"] != nullptr){
+        int factor = jsonscene["SuperSamplingFactor"];
+        scene.setSuperSamplingFactor(factor);
+    }
 
     Point eye(jsonscene["Eye"]);
     scene.setEye(eye);
