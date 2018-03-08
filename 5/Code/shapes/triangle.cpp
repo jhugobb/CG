@@ -52,3 +52,7 @@ Triangle::Triangle(Point const &v0,
     N = U.cross(V);
     N.normalize();
 }
+
+Point2D Triangle::textureCoordinates(Point const &p){
+    return Point2D(0,0);
+}

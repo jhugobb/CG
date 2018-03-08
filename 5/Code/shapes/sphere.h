@@ -3,15 +3,17 @@
 
 #include "../object.h"
 
-class Sphere: public Object
+class Sphere : public Object
 {
-    public:
-        Sphere(Point const &pos, double radius);
+  public:
+    Sphere(Point const &pos, double radius);
 
-        virtual Hit intersect(Ray const &ray);
+    virtual Hit intersect(Ray const &ray);
 
-        Point const position;
-        double const r;
+    virtual Point2D textureCoordinates(Point const &p);
+
+    Point const position;
+    double const r;
 };
 
 #endif

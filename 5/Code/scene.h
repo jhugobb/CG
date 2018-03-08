@@ -18,6 +18,7 @@ class Scene
   Point eye;
   bool SHADOWS = false;
   int SuperSamplingFactor = 1;
+  int MaxRecursionDepth = 0;
   Color superSampling(Point pixel, int factor);
 
 public:
@@ -32,6 +33,7 @@ public:
   void setEye(Triple const &position);
   void setShadow(bool s);
   void setSuperSamplingFactor(int f);
+  void setMaxRecursionDepth(int n);
 
   unsigned getNumObject();
   unsigned getNumLights();

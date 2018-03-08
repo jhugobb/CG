@@ -75,14 +75,26 @@ Light Raytracer::parseLightNode(json const &node) const
     return Light(pos, col);
 }
 
-Material Raytracer::parseMaterialNode(json const &node) const
+Material Raytracer::parseMaterialNode(json node) 
 {
-    Color color(node["color"]);
+    Color color = Color(-1, -1, -1);
+    Image texture = Image();
+    if (node["color"] != nullptr)
+    {
+        color = Color(node["color"]);
+    }
+    if (node["texture"] != nullptr)
+    {
+        texture  = Image((string const &) node["texture"]);
+        if (texture.d_pixels.size() == 0) {
+            std::cerr << "No texture file was loaded, the directory is probably wrong.";
+        }
+    }
     double ka = node["ka"];
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
-    return Material(color, ka, kd, ks, n);
+    return Material(color, texture, ka, kd, ks, n);
 }
 
 bool Raytracer::readScene(string const &ifname)
@@ -107,6 +119,11 @@ try
     if(jsonscene["SuperSamplingFactor"] != nullptr){
         int factor = jsonscene["SuperSamplingFactor"];
         scene.setSuperSamplingFactor(factor);
+    }
+
+    if(jsonscene["MaxRecursionDepth"] != nullptr){
+        int n = int(jsonscene["MaxRecursionDepth"]);
+        scene.setMaxRecursionDepth(n);
     }
 
     Point eye(jsonscene["Eye"]);

@@ -11,6 +11,9 @@ Hit Example::intersect(Ray const &ray)
 
     return Hit(t, N);
 }
+Point2D Example::textureCoordinates(Point const &p){
+    return Point2D(0,0);
+}
 
 Example::Example(/* YOUR DATAMEMBERS HERE */)
 //:

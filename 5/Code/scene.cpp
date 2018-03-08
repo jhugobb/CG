@@ -8,7 +8,6 @@
 #include <cmath>
 #include <limits>
 
-#define BOUNCESNR 2
 using namespace std;
 
 Vector calculateReflection(Vector L, Vector N){
@@ -93,8 +92,8 @@ Color Scene::trace(Ray const &ray, int recursionDepth)
         }
     }
 
-    IA = material.color * material.ka;
-    ID = ID * material.color * material.kd;
+    IA = obj->getColor(hit) * material.ka;  //replace material color with something that gives you the texture color
+    ID = ID * obj->getColor(hit) * material.kd;
     IS = IS * material.ks;
 
     //double ID = max(0.0, N.dot(V)) * material.kd;
@@ -109,12 +108,12 @@ Color Scene::superSampling (Point pixel, int factor) {
 
     for (int x = 0 ; x < factor ; x++)
     {
-        sample = fstSample + Point(x * unit, 0, 0); //positionin on the lower sample
+        sample = fstSample + Point(x * unit, 0, 0); //positioning on the lower sample
         for (int y = 0 ; y < factor ; y++)
         {
             sample = sample + Point(0, unit, 0); //going up in the y axis
             Ray ray(eye, (sample - eye).normalized());
-            r = r + trace(ray, BOUNCESNR);
+            r = r + trace(ray, MaxRecursionDepth);
         }
     }
     return r / (factor*factor);
@@ -131,7 +130,7 @@ void Scene::render(Image &img)
         {
             Point pixel(x, h - 1 - y, 0);
             //Ray ray(eye, (pixel - eye).normalized());
-            //Color col = trace(ray, BOUNCESNR);
+            //Color col = trace(ray, MaxRecursionDepth);
             Color col = superSampling(pixel, SuperSamplingFactor);
             col.clamp();
             img(x, y) = col;
@@ -174,4 +173,9 @@ void Scene::setShadow(bool s)
 void Scene::setSuperSamplingFactor(int f)
 {
     SuperSamplingFactor = f;
+}
+
+void Scene::setMaxRecursionDepth(int n)
+{
+    MaxRecursionDepth = n;
 }

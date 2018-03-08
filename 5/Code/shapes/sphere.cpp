@@ -28,10 +28,11 @@ Hit Sphere::intersect(Ray const &ray)
     float t0, t1;
     float a = ray.D.dot(ray.D);
     float b = 2 * ray.D.dot(OC);
-    float c = OC.dot(OC) - (r*r);
+    float c = OC.dot(OC) - (r * r);
     if (!solveQuadratic(a, b, c, t0, t1))
         return Hit::NO_HIT();
-    if (t0 < 0) {
+    if (t0 < 0)
+    {
         t0 = t1; // if t0 is negative, let's use t1 instead
         if (t0 < 0)
             return Hit::NO_HIT(); // both t0 and t1 are negative
@@ -48,13 +49,20 @@ Hit Sphere::intersect(Ray const &ray)
     * Insert calculation of the sphere's normal at the intersection point.
     ****************************************************/
     Vector P = ray.O + ray.D * t;
-    Vector N = (P - position).normalized() ;
+    Vector N = (P - position).normalized();
 
-    return Hit(t,N);
+    return Hit(t, N);
+}
+
+Point2D Sphere::textureCoordinates(Point const &p)
+{
+    Vector n = (position - p).normalized(); //try not normalized
+    //std::cout << "\nVALLEEEEE" << acos(n.z / abs(n.x)) << "\n";
+    return Point2D(0.5 + (atan2(n.z, n.x) / (2 * M_PI)) , 0.5 - (asin(n.y) / M_PI));
 }
 
 Sphere::Sphere(Point const &pos, double radius)
-:
-    position(pos),
-    r(radius)
-{}
+    : position(pos),
+      r(radius)
+{
+}
