@@ -2,11 +2,13 @@
 #define MATERIAL_H_
 
 #include "triple.h"
+#include "image.h"
 
 class Material
 {
     public:
         Color color;        // base color
+        Image texture;      // Texture
         double ka;          // ambient intensity
         double kd;          // diffuse intensity
         double ks;          // specular intensity
@@ -14,9 +16,10 @@ class Material
 
         Material() = default;
 
-        Material(Color const &color, double ka, double kd, double ks, double n)
+        Material(Color const &color, Image texture, double ka, double kd, double ks, double n)
         :
             color(color),
+            texture(texture),
             ka(ka),
             kd(kd),
             ks(ks),

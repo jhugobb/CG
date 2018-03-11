@@ -27,19 +27,26 @@
 using namespace std;        // no std:: required
 using json = nlohmann::json;
 
-bool Raytracer::parseObjectNode(json const &node)
+bool Raytracer::parseObjectNode(json node)
 {
     ObjectPtr obj = nullptr;
 
 // =============================================================================
 // -- Determine type and parse object parametrers ------------------------------
 // =============================================================================
-
     if (node["type"] == "sphere")
     {
         Point pos(node["position"]);
         double radius = node["radius"];
-        obj = ObjectPtr(new Sphere(pos, radius));
+        Triple rotation;
+        double angle = 0;
+        if (node["rotation"] != nullptr) {
+            rotation = Triple(node["rotation"]);
+        }
+        if (node["angle"] != nullptr) {
+            angle = node["angle"];
+        }       
+        obj = ObjectPtr(new Sphere(pos, radius, rotation, angle));
     } else if (node["type"] == "triangle") {
         json points = node["points"];
         Point pointA(points["a"]);
@@ -68,21 +75,34 @@ bool Raytracer::parseObjectNode(json const &node)
     return true;
 }
 
-Light Raytracer::parseLightNode(json const &node) const
+Light Raytracer::parseLightNode(json node) const
 {
     Point pos(node["position"]);
     Color col(node["color"]);
     return Light(pos, col);
 }
 
-Material Raytracer::parseMaterialNode(json const &node) const
+Material Raytracer::parseMaterialNode(json node) const
 {
-    Color color(node["color"]);
+    Color color = Color(-1, -1, -1);
+    Image texture = Image();
+    if (node["color"] != nullptr)
+    {
+        color = Color(node["color"]);
+    } else if (node["texture"] != nullptr) {
+        string const &tex = node["texture"];
+        cout << "Here is the file: " << tex << endl;
+        texture = Image(tex);
+        if (texture.d_pixels.size() == 0)
+        {
+            std::cerr << "No texture file was loaded, the directory is probably wrong.";
+        }
+    }
     double ka = node["ka"];
     double kd = node["kd"];
     double ks = node["ks"];
     double n  = node["n"];
-    return Material(color, ka, kd, ks, n);
+    return Material(color, texture, ka, kd, ks, n);
 }
 
 bool Raytracer::readScene(string const &ifname)
@@ -117,7 +137,7 @@ try
 
     unsigned objCount = 0;
 
-    for (auto const &meshNode : jsonscene["Meshes"]) {
+    for (auto meshNode : jsonscene["Meshes"]) {
         const string s = meshNode["model"];
         OBJLoader objLoader = OBJLoader(s);
         objLoader.unitize();
@@ -139,7 +159,7 @@ try
         ++objCount;
     }
 
-    for (auto const &objectNode : jsonscene["Objects"])
+    for (auto objectNode : jsonscene["Objects"])
         if (parseObjectNode(objectNode))
             ++objCount;
 

@@ -10,7 +10,8 @@ class Plane : public Object
 
     virtual Hit intersect(Ray const &ray);
 
-    /* YOUR DATA MEMBERS HERE*/
+    virtual Point2D textureCoords(Point const &p);
+
     Point const p0;
     Triple const N;
 };

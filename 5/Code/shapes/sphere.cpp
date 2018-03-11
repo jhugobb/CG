@@ -29,8 +29,34 @@ Hit Sphere::intersect(Ray const &ray)
     return Hit(t,N);
 }
 
-Sphere::Sphere(Point const &pos, double radius)
+Point2D Sphere::textureCoords(Point const &p) {
+    Vector n = (p - position).normalized(); //try not normalized
+    Triple rN = rotation.normalized();
+
+    // Rotation Matrix
+    double rotMatrix[3][3];
+    rotMatrix[0][0] = cos(angle) + (rN.x*rN.x)*(1-cos(angle));
+    rotMatrix[0][1] = rN.x*rN.y*(1-cos(angle))-rN.z*sin(angle);
+    rotMatrix[0][2] = rN.x*rN.z*(1-cos(angle)) + rN.y*sin(angle);
+    rotMatrix[1][0] = rN.y * rN.x * (1 - cos(angle)) + rN.z * sin(angle);
+    rotMatrix[1][1] = cos(angle) + (rN.y * rN.y) * (1 - cos(angle));
+    rotMatrix[1][2] = rN.y * rN.z * (1 - cos(angle)) - rN.x * sin(angle);
+    rotMatrix[2][0] = rN.x * rN.z * (1 - cos(angle)) - rN.y * sin(angle);
+    rotMatrix[2][1] = rN.y * rN.z * (1 - cos(angle)) + rN.x * sin(angle);
+    rotMatrix[2][2] = cos(angle) + (rN.z * rN.z) * (1 - cos(angle));
+
+    Triple r;
+    r.x = n.x * rotMatrix[0][0] + n.y * rotMatrix[0][1] + n.z * rotMatrix[0][2];
+    r.y = n.x * rotMatrix[1][0] + n.y * rotMatrix[1][1] + n.z * rotMatrix[1][2];
+    r.z = n.x * rotMatrix[2][0] + n.y * rotMatrix[2][1] + n.z * rotMatrix[2][2];
+
+    return Point2D(0.5 + (atan2(r.y, r.x) / (2 * M_PI)), 1 - (acos(r.z) / M_PI));
+}
+
+Sphere::Sphere(Point const &pos, double radius, Triple rot, double a)
 :
     position(pos),
-    r(radius)
+    r(radius),
+    rotation(rot),
+    angle(a)
 {}

@@ -37,6 +37,11 @@ Hit Triangle::intersect(Ray const &ray)
     return Hit(t, normal);
 }
 
+Point2D Triangle::textureCoords(Point const &p)
+{
+    return Point2D(p.x, p.y);
+}
+
 Triangle::Triangle(Point const &v0,
          Point const &v1,
          Point const &v2)

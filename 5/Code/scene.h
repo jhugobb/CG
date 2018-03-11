@@ -33,7 +33,7 @@ class Scene
         void setEye(Triple const &position);
         void setShadow(bool const &isShadowActive);
         void setRecursionDepth(double const &recursionDepth);
-        ObjectPtr intersectObj(Hit *min_hit, Ray ray);
+        ObjectPtr intersectObj(Hit *min_hit, Ray ray, ObjectPtr obj);
         Color superSample(unsigned x, unsigned y, unsigned h, double sampling);
 
         unsigned getNumObject();

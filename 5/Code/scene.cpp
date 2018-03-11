@@ -11,26 +11,26 @@
 
 using namespace std;
 
-ObjectPtr Scene::intersectObj(Hit *min_hit, Ray ray) {
-    ObjectPtr obj = nullptr;
+ObjectPtr Scene::intersectObj(Hit *min_hit, Ray ray, ObjectPtr obj) {
+    ObjectPtr objtmp = nullptr;
     for (unsigned idx = 0; idx != objects.size(); ++idx)
     {
         Hit hit(objects[idx]->intersect(ray));
 
-        if (hit.t < min_hit->t)
+        if (objects[idx] != obj && hit.t < min_hit->t)
         {
             *min_hit = hit;
-            obj = objects[idx];
+            objtmp = objects[idx];
         }
     }
-    return obj;
+    return objtmp;
 }
 
 Color Scene::trace(Ray const &ray, double recursionDepth)
 {
     // Find hit object and distance
     Hit min_hit(numeric_limits<double>::infinity(), Vector());
-    ObjectPtr obj = intersectObj(&min_hit, ray);
+    ObjectPtr obj = intersectObj(&min_hit, ray, nullptr);
 
     // No hit? Return background color.
     if (!obj) return Color(0.0, 0.0, 0.0);
@@ -45,7 +45,6 @@ Color Scene::trace(Ray const &ray, double recursionDepth)
     IA = ID = IS = Color();
     Vector L, R;
     ObjectPtr objLight = nullptr;
-    Hit min_hit_light(numeric_limits<double>::infinity(), Vector());
     Vector reflectionView = 2 * (V.dot(N)) * N - V;
 
     // If we want to calculate reflection
@@ -56,20 +55,21 @@ Color Scene::trace(Ray const &ray, double recursionDepth)
 
     for (unsigned int i = 0; i < lights.size(); i++) {
         L = (lights[i]->position - hit).normalized();
-        R = 2 * (L.dot(N)) * N - L;
+        Hit min_hit_light(numeric_limits<double>::infinity(), Vector());
         // If we want to take shadows into account 
         if (shadow) {
-            Ray lightRay(hit + 0.01*L , L);
-            objLight = intersectObj(&min_hit_light, lightRay);
+            Ray lightRay(hit + 0.001*L , L);
+            objLight = intersectObj(&min_hit_light, lightRay, obj);
         }
         // If we didnt hit any other object -> always true when we don't take shadows into account
         if (!objLight) {
+            R = 2 * (L.dot(N)) * N - L;
             ID += max(0.0, L.dot(N)) * lights[i]->color;
             IS += pow(max(0.0, R.dot(V)), material.n) * lights[i]->color;
         }
     }
-    IA = material.color * material.ka;
-    ID = ID * material.color * material.kd;
+    IA = obj->getColor(hit) * material.ka;
+    ID = ID * obj->getColor(hit) * material.kd;
     IS = IS * material.ks;
 
     Color color = IA + ID + IS;
@@ -101,7 +101,7 @@ void Scene::render(Image &img)
         for (unsigned x = 0; x < w; ++x)
         {
             // Currently 2x2 Anti-aliasing, but implemented to be nxn
-            Color finalColor = superSample(x, y, h, 4);
+            Color finalColor = superSample(x, y, h, 1);
             finalColor.clamp();
             img(x, y) = finalColor;
         }

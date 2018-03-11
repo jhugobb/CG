@@ -8,11 +8,11 @@
 
 class Image
 {
-    std::vector<Color> d_pixels;
     unsigned d_width;
     unsigned d_height;
 
     public:
+        std::vector<Color> d_pixels;
         Image(unsigned width = 0, unsigned height = 0);
         Image(std::string const &filename);
 

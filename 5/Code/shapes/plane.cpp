@@ -17,6 +17,10 @@ Hit Plane::intersect(Ray const &ray)
     return Hit::NO_HIT();
 }
 
+Point2D Plane::textureCoords(Point const &p) {
+    return Point2D(p.x, p.y);
+}
+
 Plane::Plane(Point const &p0, Triple const &N)
 :
     p0(p0),
