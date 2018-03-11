@@ -57,8 +57,10 @@ Hit Sphere::intersect(Ray const &ray)
 Point2D Sphere::textureCoordinates(Point const &p)
 {
     Vector n = (position - p).normalized(); //try not normalized
-    //std::cout << "\nVALLEEEEE" << acos(n.z / abs(n.x)) << "\n";
-    return Point2D(0.5 + (atan2(n.z, n.x) / (2 * M_PI)) , 0.5 - (asin(n.y) / M_PI));
+    //if ((n.z / abs(n.x)) > 1 || (n.z / abs(n.x)) < -1)
+    //std::cout << "\nVALLEEEEE z = " << n.z << " and abs(x) = " << abs(n.x) << "\n";
+    return Point2D(0.5 - (atan2(n.z, n.x) / (2 * M_PI)) , 0.5 + (asin(n.y) / M_PI)); //wikipedia formula
+    //return Point2D((M_PI + atan2(n.y, n.x))/ (2 * M_PI) , (M_PI - acos(n.z / abs(n.x))) / M_PI); //Book formula (doesn't work)
 }
 
 Sphere::Sphere(Point const &pos, double radius)
