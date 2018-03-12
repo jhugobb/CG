@@ -2,7 +2,6 @@
     "Eye": [200, 200, 1000],
     "Shadows": true,
     "MaxRecursionDepth": 2,
-    "SuperSamplingFactor": 4,
     "Lights": [
         {
             "position": [-200, 600, 1500],
@@ -66,7 +65,7 @@
             "material":
             {
                 "comment": "image is relative to scene file here!",
-                "texture": "/home/red/Desktop/curso/NL/CG/5/Scenes/earthmap1k.png",
+                "texture": "../Scenes/earthmap1k.png",
                 "ka": 0.2,
                 "kd": 0.8,
                 "ks": 0.0,

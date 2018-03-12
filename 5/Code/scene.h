@@ -17,7 +17,9 @@ class Scene
     std::vector<LightPtr> lights;   // no ptr needed, but kept for consistency
     Point eye;
     bool shadow;
-    double recursionDepth = 0;
+    int recursionDepth = 0;
+    int superSamplingFactor = 1;
+    
 
     public:
 
@@ -33,6 +35,7 @@ class Scene
         void setEye(Triple const &position);
         void setShadow(bool const &isShadowActive);
         void setRecursionDepth(double const &recursionDepth);
+        void setSuperSamplingFactor(int f);
         ObjectPtr intersectObj(Hit *min_hit, Ray ray, ObjectPtr obj);
         Color superSample(unsigned x, unsigned y, unsigned h, double sampling);
 

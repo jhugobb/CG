@@ -126,8 +126,13 @@ try
     }
 
     if (jsonscene["MaxRecursionDepth"] != nullptr) {
-        double recursionDepth(jsonscene["MaxRecursionDepth"]);
+        int recursionDepth(jsonscene["MaxRecursionDepth"]);
         scene.setRecursionDepth(recursionDepth);
+    }
+
+    if (jsonscene["SuperSamplingFactor"] != nullptr) {
+        int superSamplingFactor(jsonscene["SuperSamplingFactor"]);
+        scene.setSuperSamplingFactor(superSamplingFactor);
     }
 
     ObjectPtr obj = nullptr;

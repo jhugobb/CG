@@ -8,9 +8,9 @@ using namespace std;
 
 Image::Image(unsigned width, unsigned height)
 :
-    d_pixels(width * height),
     d_width(width),
-    d_height(height)
+    d_height(height),
+    d_pixels(width * height)
 {}
 
 Image::Image(string const &filename)

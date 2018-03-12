@@ -101,7 +101,7 @@ void Scene::render(Image &img)
         for (unsigned x = 0; x < w; ++x)
         {
             // Currently 2x2 Anti-aliasing, but implemented to be nxn
-            Color finalColor = superSample(x, y, h, 1);
+            Color finalColor = superSample(x, y, h, superSamplingFactor);
             finalColor.clamp();
             img(x, y) = finalColor;
         }
@@ -131,6 +131,11 @@ void Scene::setShadow(bool const &isShadowActive) {
 
 void Scene::setRecursionDepth(double const &value) {
     recursionDepth = value;
+}
+
+void Scene::setSuperSamplingFactor(int f)
+{
+    superSamplingFactor = f;
 }
 
 unsigned Scene::getNumObject()
