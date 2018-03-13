@@ -22,9 +22,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 
 
 public:
-    enum MODELINDEX
+    enum MODELINDEX : int
     {
-        MODEL = 0,
+        CAT = 0,
+        SPHERE,
         COUNT
     };
 
@@ -32,16 +33,20 @@ public:
     GLuint vao[MODELINDEX::COUNT]; // [model]
     GLuint texture[MODELINDEX::COUNT]; // [model]
 
-    QMatrix4x4 cubeMatrix;
-    QMatrix4x4 pyramidMatrix;
-    QMatrix4x4 modelMatrix;
-    qreal modelScale = 1.0;
+    QMatrix4x4 objectMatrix[MODELINDEX::COUNT];
     QMatrix4x4 projMatrix = QMatrix4x4();
-    qreal xRotation = 0;
-    qreal yRotation = 0;
-    qreal zRotation = 0;
-    qreal scale = 1;
-    int modelSize;
+    qreal xRotation[MODELINDEX::COUNT];
+    qreal yRotation[MODELINDEX::COUNT];
+    qreal zRotation[MODELINDEX::COUNT];
+    qreal xTranslation[MODELINDEX::COUNT];
+    qreal yTranslation[MODELINDEX::COUNT];
+    qreal zTranslation[MODELINDEX::COUNT];
+    qreal objectScale[MODELINDEX::COUNT];
+    qreal generalScale = 1;
+    qreal xGeneralRotation = 0;
+    qreal yGeneralRotation = 0;
+    qreal zGeneralRotation = 0;
+    int modelSize[MODELINDEX::COUNT];
 
     enum ShadingMode : GLuint
     {
@@ -63,15 +68,16 @@ public:
     ~MainView();
 
     void rotate(qreal x, qreal y, qreal z);
-    void turnCubeToOriginal();
-    void turnPyramidToOriginal ();
-    void turnModelToOriginal();
 
     // Functions for widget input events
-    void setRotation(int rotateX, int rotateY, int rotateZ);
+    void setRotation(qreal rotateX, qreal rotateY, qreal rotateZ);
     void setScale(int scale);
     void setShadingMode(ShadingMode shading);
     void loadTexture(QString file, GLuint texturePtr);
+    void AddRotation(int index, qreal x, qreal y, qreal z);
+    void updateObjects();
+    void loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath);
+    void initializeObjectsAttributes();
 
 protected:
     void initializeGL();

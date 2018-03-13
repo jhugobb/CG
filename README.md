@@ -1,10 +1,4 @@
 # CG
 Project for the Computer Graphics course @ RUG
 
-Part 2:
-    This project implements:
-        -Everyone of the main features that the assignement asks for.
-        -Class constructed objects (triangle, square, cube, pyramid), that are automatically generated giving only the non-redudant vertexes.
-        -The capability to scale imported models to one unit-cube. (i.e.: 2 unit edge [-1, 1])
-    User instructions:
-        -The use cases are the already given by using the widgets.
+-We animated our cat model by at each frame adding one degree to each of its coordinates. After adding the program calcules the modulus by 360 (i.e.: if we reach the 398 degrees of rotation for example, we do 398 % 360 = 38).

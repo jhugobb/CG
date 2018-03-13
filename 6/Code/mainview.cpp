@@ -21,36 +21,24 @@ MainView::MainView(QWidget *parent) : QOpenGLWidget(parent) {
     connect(&timer, SIGNAL(timeout()), this, SLOT(update()));
     //making the matrix initial transformations
 
-    turnCubeToOriginal();
-    turnPyramidToOriginal();
-    turnModelToOriginal();
     projMatrix.perspective(60, 1, 0.01, 100);
 }
 
-/**
- * @brief MainView::turnCubeToOriginal Translates and scales the cube to its original state
- */
-void MainView::turnCubeToOriginal () {
-    cubeMatrix = QMatrix4x4();
-    cubeMatrix.translate(2, 0, -6);
-}
-
-/**
- * @brief MainView::turnCubeToOriginal Translates and scales the pyramid to its original state
- */
-void MainView::turnPyramidToOriginal () {
-    pyramidMatrix = QMatrix4x4();
-    pyramidMatrix.translate(-2, 0, -6);
-}
-
-/**
- * @brief MainView::turnModelToOriginal Translates and scales the model to its original state
- * @param m Model
- */
-void MainView::turnModelToOriginal () {
-    modelMatrix = QMatrix4x4();
-    modelMatrix.translate(0, 0, -10);
-    modelMatrix.scale(modelScale);
+void MainView::updateObjects ()
+{
+    for (int i = 0 ; i < MODELINDEX::COUNT ; i++)
+    {
+        objectMatrix[i] = QMatrix4x4();
+        objectMatrix[i].translate(xTranslation[i], yTranslation[i], zTranslation[i]);
+        objectMatrix[i].scale(generalScale);
+        objectMatrix[i].scale(objectScale[i]);
+        objectMatrix[i].rotate(xGeneralRotation, 1, 0, 0);
+        objectMatrix[i].rotate(yGeneralRotation, 0, 1, 0);
+        objectMatrix[i].rotate(zGeneralRotation, 0, 0, 1);
+        objectMatrix[i].rotate(xRotation[i], 1, 0, 0);
+        objectMatrix[i].rotate(yRotation[i], 0, 1, 0);
+        objectMatrix[i].rotate(zRotation[i], 0, 0, 1);
+    }
 }
 
 /**
@@ -89,12 +77,11 @@ MainView::~MainView() {
     //cleaning everything
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    shaderProgram[NORMAL].removeAllShaders();
-    shaderProgram[NORMAL].release();
-    shaderProgram[PHONG].removeAllShaders();
-    shaderProgram[PHONG].release();
-    shaderProgram[GOURAUD].removeAllShaders();
-    shaderProgram[GOURAUD].release();
+    for (GLuint i = 0 ; i < COUNTSHADER ; i++)
+    {
+        shaderProgram[i].removeAllShaders();
+        shaderProgram[i].release();
+    }
     glDeleteBuffers(COUNT, vbo);
     glDeleteVertexArrays(COUNT, vao);
     glDeleteTextures(COUNT, texture);
@@ -146,34 +133,57 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
-    GLsizei size = sizeof(Vertex);
+    loadModel(SPHERE, ":/models/sphere.obj", ":/textures/cat_diff.png");
+    loadModel(CAT, ":/models/cat.obj", ":/textures/cat_diff.png");
 
-    Model m = Model(":/models/cat.obj");
+    initializeObjectsAttributes();
+
+    timer.start(1000.0/60.0);
+}
+
+void MainView::initializeObjectsAttributes()
+{
+    for (int i = 0 ; i < COUNT ; i++)
+    {
+        xRotation[i] = 0;
+        yRotation[i] = 0;
+        zRotation[i] = 0;
+        xTranslation[i] = 0;
+        yTranslation[i] = 0;
+        zTranslation[i] = -7;
+        objectScale[i] = 1;
+    }
+
+    xTranslation[CAT] = -3;
+    xTranslation[SPHERE] = 3;
+}
+
+void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)
+{
+    Model m = Model(objPath);
     m.unitize();
-    loadTexture(":/textures/cat_diff.png", texture[MODEL]);
+    loadTexture(texturePath, texture[modelNr]);
     QVector<QVector3D> vm = m.getVertices();
-    modelSize = vm.size();
-    Vertex vv[modelSize];
+    modelSize[modelNr] = vm.size();
+    Vertex vv[modelSize[modelNr]];
     QVector<QVector3D> normals = m.getNormals();
-        QVector<QVector2D> texCoords = m.getTextureCoords();
+    QVector<QVector2D> texCoords = m.getTextureCoords();
     for (int i = 0 ; i < vm.size() ; i++) {
         vv[i] = Vertex(vm[i].x(), vm[i].y(), vm[i].z(), normals[i].x(), normals[i].y(), normals[i].z(), texCoords[i].x(), texCoords[i].y());
     }
 
-
-
     //Buffering the model
-    glBindVertexArray(vao[MODEL]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[MODEL]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize, vv, GL_DYNAMIC_DRAW);
+    glBindVertexArray(vao[modelNr]);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[modelNr]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * modelSize[modelNr], vv, GL_DYNAMIC_DRAW);
 
     //Sending layout info
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(0, 3, GL_FLOAT, false, size, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*3));
-    glVertexAttribPointer(2, 2, GL_FLOAT, false, size, (GLvoid *) (sizeof(GLfloat)*6));
+    glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(Vertex), 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(Vertex), (GLvoid *) (sizeof(GLfloat)*3));
+    glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(Vertex), (GLvoid *) (sizeof(GLfloat)*6));
 }
 
 void MainView::createShaderProgram()
@@ -183,27 +193,12 @@ void MainView::createShaderProgram()
                                            ":/shaders/vertshader_normal.glsl");
     shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_normal.glsl");
-    shaderProgram[NORMAL].link();
-
-    modelShaderTransform[NORMAL] = shaderProgram[NORMAL].uniformLocation("modelTransform");
-    projLocation[NORMAL] = shaderProgram[NORMAL].uniformLocation("projTransform");
-    normalLocation[NORMAL] = shaderProgram[NORMAL].uniformLocation("normalTransform");
-
     //PHONG
 
     shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
                                            ":/shaders/vertshader_phong.glsl");
     shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_phong.glsl");
-    shaderProgram[PHONG].link();
-
-    modelShaderTransform[PHONG]= shaderProgram[PHONG].uniformLocation("modelTransform");
-    projLocation[PHONG] = shaderProgram[PHONG].uniformLocation("projTransform");
-    normalLocation[PHONG] = shaderProgram[PHONG].uniformLocation("normalTransform");
-    samplerLocation[PHONG] = shaderProgram[PHONG].uniformLocation("samplerUniform");
-    lightColorLocation[PHONG] = shaderProgram[PHONG].uniformLocation("lightColor");
-    lightPositionLocation[PHONG] = shaderProgram[PHONG].uniformLocation("lightPosition");
-    materialLocation[PHONG] = shaderProgram[PHONG].uniformLocation("material");
 
     //GOURAUD
 
@@ -211,17 +206,20 @@ void MainView::createShaderProgram()
                                            ":/shaders/vertshader_gouraud.glsl");
     shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
                                            ":/shaders/fragshader_gouraud.glsl");
-    shaderProgram[GOURAUD].link();
 
-    modelShaderTransform[GOURAUD]= shaderProgram[GOURAUD].uniformLocation("modelTransform");
-    projLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("projTransform");
-    normalLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("normalTransform");
-    samplerLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("samplerUniform");
-    lightColorLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("lightColor");
-    materialColorLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("materialColor");
-    lightPositionLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("lightPosition");
-    materialLocation[GOURAUD] = shaderProgram[GOURAUD].uniformLocation("material");
+    for (GLuint i = 0 ; i < COUNTSHADER ; i++)
+    {
+        shaderProgram[i].link();
 
+        modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
+        projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
+        normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
+        samplerLocation[i] = shaderProgram[i].uniformLocation("samplerUniform");
+        lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
+        materialColorLocation[i] = shaderProgram[i].uniformLocation("materialColor");
+        lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
+        materialLocation[i] = shaderProgram[i].uniformLocation("material");
+    }
 }
 
 // --- OpenGL drawing
@@ -236,6 +234,11 @@ void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    //Animation
+    AddRotation(CAT, 1, 1, 1);
+    AddRotation(SPHERE, 1, 1, 1);
+    updateObjects();
+
     float lightColor[3] = {1.0, 1.0, 1.0};
     float materialColor[3] = {1.0, 1.0, 1.0};
     float material[4] = {0.2, 0.8, 0.0, 1};
@@ -244,25 +247,36 @@ void MainView::paintGL() {
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
-    glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.normalMatrix().data());
     glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
     glUniform3fv(materialColorLocation[currentShade], 1, materialColor);
     glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
     glUniform4fv(materialLocation[currentShade], 1, material);
     glUniform1i(samplerLocation[currentShade], 0);
 
-    //draw
+    //models
 
-    //model
+    for (int i = 0 ; i < MODELINDEX::COUNT ; i++)
+    {
+        glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) objectMatrix[i].normalMatrix().data());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture[i]);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture[MODEL]);
-
-    glBindVertexArray(vao[MODEL]);
-    glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) modelMatrix.data());
-    glDrawArrays(GL_TRIANGLES, 0, modelSize);
+        glBindVertexArray(vao[i]);
+        glUniformMatrix4fv(modelShaderTransform[currentShade], 1, GL_FALSE, (GLfloat *) objectMatrix[i].data());
+        glDrawArrays(GL_TRIANGLES, 0, modelSize[i]);
+    }
 
     shaderProgram[currentShade].release();
+}
+
+void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
+{
+    xRotation[index] += x;
+    xRotation[index] = fmod(xRotation[index] , 360.0);
+    yRotation[index] += y;
+    yRotation[index] = fmod(yRotation[index] , 360.0);
+    zRotation[index] += z;
+    zRotation[index] = fmod(zRotation[index] , 360.0);
 }
 
 /**
@@ -273,7 +287,7 @@ void MainView::paintGL() {
  * @param newWidth
  * @param newHeight
  */
-void MainView::resizeGL(int newWidth, int newHeight) 
+void MainView::resizeGL(int newWidth, int newHeight)
 {
     float ratio = ((float) newWidth) / ((float) newHeight);
 
@@ -285,43 +299,16 @@ void MainView::resizeGL(int newWidth, int newHeight)
 
 // --- Public interface
 
-void MainView::setRotation(int rotateX, int rotateY, int rotateZ)
+void MainView::setRotation(qreal rotateX, qreal rotateY, qreal rotateZ)
 {
     qDebug() << "Rotation changed to (" << rotateX << "," << rotateY << "," << rotateZ << ")";
 
-    //reinitialization of the matrixes so that the rotation is effectively correct
-    turnCubeToOriginal();
-    turnPyramidToOriginal();
-    turnModelToOriginal();
-
     //qreal x = ((qreal) rotateX) / 360;
-    xRotation = rotateX;
-    yRotation = rotateY;
-    zRotation = rotateZ;
+    xGeneralRotation = rotateX;
+    yGeneralRotation = rotateY;
+    zGeneralRotation = rotateZ;
 
-    cubeMatrix.scale(scale);
-    pyramidMatrix.scale(scale);
-    modelMatrix.scale(scale);
-    rotate(xRotation, yRotation, zRotation);
     update();
-}
-
-/**
- * @brief MainView::rotate Auxiliary function to define the rotation of the models.
- * @param x X axis rotation.
- * @param y Y axis rotation.
- * @param z Z axis rotation.
- */
-void MainView::rotate(qreal x, qreal y, qreal z) {
-    cubeMatrix.rotate(x, 1, 0, 0);
-    cubeMatrix.rotate(y, 0, 1, 0);
-    cubeMatrix.rotate(z, 0, 0, 1);
-    pyramidMatrix.rotate(x, 1, 0, 0);
-    pyramidMatrix.rotate(y, 0, 1, 0);
-    pyramidMatrix.rotate(z, 0, 0, 1);
-    modelMatrix.rotate(x, 1, 0, 0);
-    modelMatrix.rotate(y, 0, 1, 0);
-    modelMatrix.rotate(z, 0, 0, 1);
 }
 
 void MainView::setScale(int scale)
@@ -331,15 +318,8 @@ void MainView::setScale(int scale)
     qreal s = (qreal) scale;
 
     s = s / 100.0;
-    this->scale = s;
+    generalScale = s;
 
-    turnCubeToOriginal();
-    turnPyramidToOriginal();
-    turnModelToOriginal();
-    rotate(xRotation, yRotation, zRotation);
-    cubeMatrix.scale(s);
-    pyramidMatrix.scale(s);
-    modelMatrix.scale(s);
     update();
 }
 
