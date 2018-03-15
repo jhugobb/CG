@@ -4,6 +4,7 @@
 
 // Inputs to the fragment shader
 in vec2 uvCoor;
+in vec3 vertNormal;
 
 // Uniforms of the fragment shaders
 
