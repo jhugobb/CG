@@ -55,7 +55,6 @@ public:
     qreal zGeneralRotation = 0;
     int modelSize[MODELINDEX::COUNT];
     float ti = 0;
-    float distanceToJupiter[MODELINDEX::COUNT];
 
     enum ShadingMode : GLuint
     {
@@ -66,11 +65,6 @@ public:
     GLint modelShaderTransform[COUNTSHADER];
     GLint projLocation[COUNTSHADER];
     GLint normalLocation[COUNTSHADER];
-    GLint samplerLocation[COUNTSHADER];
-    GLint lightPositionLocation[COUNTSHADER];
-    GLint materialColorLocation[COUNTSHADER];
-    GLint lightColorLocation[COUNTSHADER];
-    GLint materialLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);
