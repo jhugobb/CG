@@ -25,8 +25,10 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
     enum MODELINDEX : int
     {
-        CAT = 0,
-        SPHERE,
+        JUPITER = 0,
+        MOON1,
+        MOON2,
+        MOON3,
         COUNT
     };
 
@@ -52,6 +54,8 @@ public:
     qreal yGeneralRotation = 0;
     qreal zGeneralRotation = 0;
     int modelSize[MODELINDEX::COUNT];
+    float ti = 0;
+    float distanceToJupiter[MODELINDEX::COUNT];
 
     enum ShadingMode : GLuint
     {
@@ -79,6 +83,7 @@ public:
     void setScale(int scale);
     void setShadingMode(ShadingMode shading);
     void loadTexture(QString file, GLuint texturePtr);
+    void animate();
     void AddRotation(int index, qreal x, qreal y, qreal z);
     void updateObjects();
     void loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath);
