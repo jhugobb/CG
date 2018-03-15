@@ -25,10 +25,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
     enum MODELINDEX : int
     {
-        JUPITER = 0,
-        MOON1,
-        MOON2,
-        MOON3,
+        GRID,
         COUNT
     };
 
@@ -62,7 +59,7 @@ public:
 
     enum ShadingMode : GLuint
     {
-        PHONG = 0, NORMAL, GOURAUD, COUNTSHADER
+        WATER, COUNTSHADER
     };
 
     QOpenGLShaderProgram shaderProgram[COUNTSHADER];
