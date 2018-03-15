@@ -33,9 +33,9 @@ void MainView::updateProjectionMatrix()
     qreal azimuth = (M_PI / 180.0) * perspectiveRotation; //calculates the azimuth value in radians
     qreal inclination = (M_PI / 180.0) * perspectiveHeight; //calculates the inclination value in radians
 
-    qreal z = EYEDISTANCE * sin(inclination) * cos(azimuth); //calcules the z coordinate of the eye
-    qreal x = EYEDISTANCE * sin(inclination) * sin(azimuth);//calcules the x coordinate of the eye
-    qreal y = EYEDISTANCE * cos(inclination);//calcules the y coordinate of the eye
+    qreal z = perspectiveDistance * sin(inclination) * cos(azimuth); //calcules the z coordinate of the eye
+    qreal x = perspectiveDistance * sin(inclination) * sin(azimuth);//calcules the x coordinate of the eye
+    qreal y = perspectiveDistance * cos(inclination);//calcules the y coordinate of the eye
 
     projMatrix.rotate(-perspectiveRotation, 0, 1, 0); //rotates the eye to direction of the focus point (currently (0,0,0)) from the perspective of the XoZ plane
 
@@ -163,7 +163,7 @@ void MainView::initializeGL() {
 
     initializeObjectsAttributes();
 
-    timer.start(1000.0/60.0);
+    timer.start(FPS);
 }
 
 void MainView::initializeObjectsAttributes()
@@ -230,22 +230,22 @@ void MainView::createShaderProgram()
 {
     //NORMAL
     shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                           ":/shaders/vertshader_normal.glsl");
+                                                  ":/shaders/vertshader_normal.glsl");
     shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                           ":/shaders/fragshader_normal.glsl");
+                                                  ":/shaders/fragshader_normal.glsl");
     //PHONG
 
     shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                           ":/shaders/vertshader_phong.glsl");
+                                                 ":/shaders/vertshader_phong.glsl");
     shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                           ":/shaders/fragshader_phong.glsl");
+                                                 ":/shaders/fragshader_phong.glsl");
 
     //GOURAUD
 
     shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                           ":/shaders/vertshader_gouraud.glsl");
+                                                   ":/shaders/vertshader_gouraud.glsl");
     shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                           ":/shaders/fragshader_gouraud.glsl");
+                                                   ":/shaders/fragshader_gouraud.glsl");
 
     for (GLuint i = 0 ; i < COUNTSHADER ; i++)
     {
@@ -312,34 +312,35 @@ void MainView::paintGL() {
 }
 
 void MainView::animate() {
-    // Makes jupiter rotate around itself
-    AddRotation(JUPITER, 0, 0.3, 0);
-    AddRotation(MOON1, 0.3, 0, 0);
-    AddRotation(MOON2, 0, 0.6, 0);
-    AddRotation(MOON3, 0, 0, 0.9);
+    if (animationIsRunning)
+    {
+        // Makes jupiter rotate around itself
+        AddRotation(JUPITER, 0, 0.3, 0);
+        AddRotation(MOON1, 0.3, 0, 0);
+        AddRotation(MOON2, 0, 0.6, 0);
+        AddRotation(MOON3, 0, 0, 0.9);
 
-    // variable that determines the step of the orbit
-    ti += 0.1f;
+        // variable that determines the step of the orbit
+        ti += 0.1f;
 
-    float angle[3];
+        float angle[3];
 
-    angle[0] = ti * 3.1419f / (1000.0/60.0);
+        angle[0] = ti * 3.1419f / (1000.0/60.0);
 
-    angle[1] = 0.03f * ti * 3.1419f / (1000.0/60.0);
+        angle[1] = 0.03f * ti * 3.1419f / (1000.0/60.0);
 
-    angle[2] = ti * 3.1419f / (1000.0/60.0);
+        angle[2] = ti * 3.1419f / (1000.0/60.0);
 
-    xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1];
-    yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1];
+        xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1];
+        yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1];
 
-    xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2];
-    yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-    zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
+        xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2];
+        yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
+        zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
 
-    xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3];
-    zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3];
-
-
+        xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3];
+        zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3];
+    }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
 {

@@ -4,6 +4,7 @@
 #include <QDebug>
 
 #define SCROLLSPEED 3
+#define ZOOMSPEED 1
 
 // Triggered by pressing a key
 void MainView::keyPressEvent(QKeyEvent *ev)
@@ -41,10 +42,27 @@ void MainView::keyPressEvent(QKeyEvent *ev)
             perspectiveHeight -= SCROLLSPEED;
         qDebug() << "W pressed, value: " << perspectiveHeight;
         break;
+    case '=':
+        if (perspectiveDistance > 1)
+            perspectiveDistance -= ZOOMSPEED;
+        qDebug() << "= pressed, value: " << perspectiveDistance;
+        break;
+    case '-':
+        perspectiveDistance += ZOOMSPEED;
+        qDebug() << "- pressed, value: " << perspectiveDistance;
+        break;
     case ' ':
-        perspectiveRotation = 0;
-        perspectiveHeight = 90;
-        qDebug() << "SPACE pressed, value: " << perspectiveHeight;
+        if (animationIsRunning)
+        {
+            timer.stop();
+            animationIsRunning = false;
+        }
+        else
+        {
+            timer.start(FPS);
+            animationIsRunning = true;
+        }
+        qDebug() << "SPACE pressed, animation is running?: " << animationIsRunning;
         break;
     default:
         // ev->key() is an integer. For alpha numeric characters keys it equivalent with the char value ('A' == 65, '1' == 49)

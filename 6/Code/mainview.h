@@ -14,7 +14,7 @@
 #include <memory>
 #include <QMatrix4x4>
 
-#define EYEDISTANCE 10
+#define FPS 1000.0/60.0
 class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
 
@@ -38,8 +38,11 @@ public:
 
     QMatrix4x4 objectMatrix[MODELINDEX::COUNT];
     QMatrix4x4 projMatrix = QMatrix4x4();
+
+    bool animationIsRunning = true;
     qreal perspectiveRotation = 0;
     qreal perspectiveHeight = 90; //also in degrees
+    qreal perspectiveDistance = 10;
     qreal projectionRatio = 1;
 
     qreal xRotation[MODELINDEX::COUNT];
