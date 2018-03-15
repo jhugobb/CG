@@ -160,7 +160,7 @@ void MainView::initializeGL() {
 
     initializeObjectsAttributes();
 
-    timer.start(FPS);
+    //timer.start(FPS);
 }
 
 void MainView::initializeObjectsAttributes()
@@ -176,7 +176,7 @@ void MainView::initializeObjectsAttributes()
         objectScale[i] = 1;
     }
 
-
+    xRotation[GRID] = -90;
 }
 
 void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)
@@ -186,7 +186,7 @@ void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *t
     if (texturePath != NULL)
         loadTexture(texturePath, texture[modelNr]);
     else
-        texture[modelNr] = NULL;
+        texture[modelNr] = -1;
     QVector<QVector3D> vm = m.getVertices();
     modelSize[modelNr] = vm.size();
     Vertex vv[modelSize[modelNr]];
