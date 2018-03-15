@@ -1,0 +1,3 @@
+In this project we implemented every feature requested except for the extra models (we were required to make 2, but only did one), we were only able to implement the sphere, the triangle and the plane.
+In scene03.json, all of these models are implemented.
+We added an extra type to the Json configuration structure. Now the program is sensitive to a "Meshes" component that contains the file location and the material. Then, using OBJloader, we parse the vertexes and apply transformation and scaling (given in the Json) to better control the position / size of the mesh. After that all the triangles are rendered with an optimization using openmp, giving us the right rendered mesh image.

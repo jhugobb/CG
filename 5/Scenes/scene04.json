@@ -1,0 +1,142 @@
+{
+    "Eye": [
+        400,
+        200,
+        1000
+    ],
+    "Lights": [
+        {
+            "position": [
+                2000,
+                2000,
+                2000
+            ],
+            "color": [
+                1.0,
+                1.0,
+                1.0
+            ]
+        }
+    ],
+    "Meshes" : [
+        {
+            "comment": "Yellow sphere",
+            "model": "../Code/models/cat.obj",
+            "translation": [
+                140,
+                0,
+                -100
+            ],
+            "scale": 200,
+            "material": {
+                "color": [
+                    1.0,
+                    0.8,
+                    0.0
+                ],
+                "ka": 0.2,
+                "kd": 0.8,
+                "ks": 0.0,
+                "n": 4
+            }
+        }
+    ],
+    "Objects": [
+        {
+            "type": "sphere",
+            "comment": "Red sphere",
+            "position": [
+                290,
+                50,
+                150
+            ],
+            "radius": 20,
+            "material": {
+                "color": [
+                    1.0,
+                    0.0,
+                    0.0
+                ],
+                "ka": 0.2,
+                "kd": 0.7,
+                "ks": 0.8,
+                "n": 32
+            }
+        },
+        {
+            "type": "plane",
+            "comment": "Blue plane",
+            "p0": [
+                260,
+                220,
+                -4000
+            ],
+            "normal": [
+                0,
+                0,
+                1
+            ],
+            "material": {
+                "color": [
+                    0.0,
+                    0.0,
+                    1.0
+                ],
+                "ka": 0.2,
+                "kd": 0.7,
+                "ks": 0.5,
+                "n": 64
+            }
+        },
+        {
+            "type": "plane",
+            "comment": "Orange plane",
+            "p0": [
+                0,
+                220,
+                602
+            ],
+            "normal": [
+                1,
+                0,
+                0
+            ],
+            "material": {
+                "color": [
+                    1.0,
+                    0.5,
+                    0.0
+                ],
+                "ka": 0.2,
+                "kd": 0.8,
+                "ks": 0.5,
+                "n": 32
+            }
+        },
+        {
+            "type": "plane",
+            "comment": "Green plane",
+            "p0": [
+                210,
+                0,
+                300
+            ],
+            "normal": [
+                0,
+                1,
+                0
+            ],
+            "material": {
+                "color": [
+                    0.0,
+                    1.0,
+                    0.0
+                ],
+                "ka": 0.2,
+                "kd": 0.3,
+                "ks": 0.5,
+                "n": 8
+            }
+        }
+    ]
+}
