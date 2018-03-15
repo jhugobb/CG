@@ -1,12 +1,51 @@
 #include "mainview.h"
+#include "math.h"
 
 #include <QDebug>
+
+#define SCROLLSPEED 3
 
 // Triggered by pressing a key
 void MainView::keyPressEvent(QKeyEvent *ev)
 {
     switch(ev->key()) {
-    case 'A': qDebug() << "A pressed"; break;
+    case 'D':
+        if (perspectiveRotation < 360 - SCROLLSPEED)
+        {
+            perspectiveRotation += SCROLLSPEED;
+        }
+        else
+        {
+            perspectiveRotation = 0;
+        }
+        qDebug() << "D pressed, value: " << perspectiveRotation;
+        break;
+    case 'A':
+        if (perspectiveRotation > SCROLLSPEED)
+        {
+            perspectiveRotation -= SCROLLSPEED;
+        }
+        else
+        {
+            perspectiveRotation = 359;
+        }
+        qDebug() << "A pressed, value: " << perspectiveRotation;
+        break;
+    case 'S':
+        if(perspectiveHeight < 180 - SCROLLSPEED)
+            perspectiveHeight += SCROLLSPEED;
+        qDebug() << "S pressed, value: " << perspectiveHeight;
+        break;
+    case 'W':
+        if(perspectiveHeight > SCROLLSPEED)
+            perspectiveHeight -= SCROLLSPEED;
+        qDebug() << "W pressed, value: " << perspectiveHeight;
+        break;
+    case ' ':
+        perspectiveRotation = 0;
+        perspectiveHeight = 90;
+        qDebug() << "SPACE pressed, value: " << perspectiveHeight;
+        break;
     default:
         // ev->key() is an integer. For alpha numeric characters keys it equivalent with the char value ('A' == 65, '1' == 49)
         // Alternatively, you could use Qt Key enums, see http://doc.qt.io/qt-5/qt.html#Key-enum
@@ -22,7 +61,9 @@ void MainView::keyPressEvent(QKeyEvent *ev)
 void MainView::keyReleaseEvent(QKeyEvent *ev)
 {
     switch(ev->key()) {
-    case 'A': qDebug() << "A released"; break;
+    case 'A':
+        qDebug() << "A released";
+        break;
     default:
         qDebug() << ev->key() << "released";
         break;
