@@ -156,7 +156,7 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
-    loadModel(GRID, ":/models/grid.obj", ":/textures/jupitermap.jpg");
+    loadModel(GRID, ":/models/grid.obj", NULL);
 
     initializeObjectsAttributes();
 
@@ -183,7 +183,10 @@ void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *t
 {
     Model m = Model(objPath);
     m.unitize();
-    loadTexture(texturePath, texture[modelNr]);
+    if (texturePath != NULL)
+        loadTexture(texturePath, texture[modelNr]);
+    else
+        texture[modelNr] = NULL;
     QVector<QVector3D> vm = m.getVertices();
     modelSize[modelNr] = vm.size();
     Vertex vv[modelSize[modelNr]];
@@ -222,11 +225,6 @@ void MainView::createShaderProgram()
         modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
         projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
         normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
-        samplerLocation[i] = shaderProgram[i].uniformLocation("samplerUniform");
-        lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
-        materialColorLocation[i] = shaderProgram[i].uniformLocation("materialColor");
-        lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
-        materialLocation[i] = shaderProgram[i].uniformLocation("material");
     }
 }
 
@@ -249,19 +247,9 @@ void MainView::paintGL() {
     updateProjectionMatrix();
     updateObjects();
 
-    float lightColor[3] = {1.0, 1.0, 1.0};
-    float materialColor[3] = {1.0, 1.0, 1.0};
-    float material[4] = {0.2, 0.8, 0.0, 1};
-    float lightPosition[3] = {100.0, 100.0, 150.0};
-
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
-    glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
-    glUniform3fv(materialColorLocation[currentShade], 1, materialColor);
-    glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
-    glUniform4fv(materialLocation[currentShade], 1, material);
-    glUniform1i(samplerLocation[currentShade], 0);
 
     //models
 
