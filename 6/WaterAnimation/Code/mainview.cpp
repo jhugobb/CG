@@ -156,10 +156,7 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
-    loadModel(JUPITER, ":/models/sphere.obj", ":/textures/jupitermap.jpg");
-    loadModel(MOON1, ":/models/sphere.obj", ":/textures/mars_1k_color.jpg");
-    loadModel(MOON2, ":/models/sphere.obj", ":/textures/mercurymap.jpg");
-    loadModel(MOON3, ":/models/sphere.obj", ":/textures/earthmap1k.png");
+    loadModel(GRID, ":/models/grid.obj", NULL);
 
     initializeObjectsAttributes();
 
@@ -179,22 +176,6 @@ void MainView::initializeObjectsAttributes()
         objectScale[i] = 1;
     }
 
-    distanceToJupiter[JUPITER] = 0;
-    distanceToJupiter[MOON1] = 3;
-    distanceToJupiter[MOON2] = 4;
-    distanceToJupiter[MOON3] = 1.5;
-
-    xTranslation[JUPITER] = 0;
-
-    xTranslation[MOON1] = distanceToJupiter[MOON1];
-    objectScale[MOON1] = 0.2;
-
-    yTranslation[MOON2] = distanceToJupiter[MOON2];
-    objectScale[MOON2] = 0.3;
-
-    xTranslation[MOON3] = distanceToJupiter[MOON3];
-    objectScale[MOON3] = 0.1;
-
 
 }
 
@@ -202,7 +183,10 @@ void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *t
 {
     Model m = Model(objPath);
     m.unitize();
-    loadTexture(texturePath, texture[modelNr]);
+    if (texturePath != NULL)
+        loadTexture(texturePath, texture[modelNr]);
+    else
+        texture[modelNr] = NULL;
     QVector<QVector3D> vm = m.getVertices();
     modelSize[modelNr] = vm.size();
     Vertex vv[modelSize[modelNr]];
@@ -228,24 +212,11 @@ void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *t
 
 void MainView::createShaderProgram()
 {
-    //NORMAL
-    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                  ":/shaders/vertshader_normal.glsl");
-    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                  ":/shaders/fragshader_normal.glsl");
-    //PHONG
-
-    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                 ":/shaders/vertshader_phong.glsl");
-    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                 ":/shaders/fragshader_phong.glsl");
-
-    //GOURAUD
-
-    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                   ":/shaders/vertshader_gouraud.glsl");
-    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                   ":/shaders/fragshader_gouraud.glsl");
+    //WATER
+    shaderProgram[WATER].addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                                  ":/shaders/vertshader_water.glsl");
+    shaderProgram[WATER].addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                                  ":/shaders/fragshader_water.glsl");
 
     for (GLuint i = 0 ; i < COUNTSHADER ; i++)
     {
@@ -254,11 +225,6 @@ void MainView::createShaderProgram()
         modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
         projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
         normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
-        samplerLocation[i] = shaderProgram[i].uniformLocation("samplerUniform");
-        lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
-        materialColorLocation[i] = shaderProgram[i].uniformLocation("materialColor");
-        lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
-        materialLocation[i] = shaderProgram[i].uniformLocation("material");
     }
 }
 
@@ -281,19 +247,9 @@ void MainView::paintGL() {
     updateProjectionMatrix();
     updateObjects();
 
-    float lightColor[3] = {1.0, 1.0, 1.0};
-    float materialColor[3] = {1.0, 1.0, 1.0};
-    float material[4] = {0.2, 0.8, 0.0, 1};
-    float lightPosition[3] = {100.0, 100.0, 150.0};
-
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
-    glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
-    glUniform3fv(materialColorLocation[currentShade], 1, materialColor);
-    glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
-    glUniform4fv(materialLocation[currentShade], 1, material);
-    glUniform1i(samplerLocation[currentShade], 0);
 
     //models
 
@@ -314,32 +270,6 @@ void MainView::paintGL() {
 void MainView::animate() {
     if (animationIsRunning)
     {
-        // Makes jupiter rotate around itself
-        AddRotation(JUPITER, 0, 0.3, 0);
-        AddRotation(MOON1, 0.3, 0, 0);
-        AddRotation(MOON2, 0, 0.6, 0);
-        AddRotation(MOON3, 0, 0, 0.9);
-
-        // variable that determines the step of the orbit
-        ti += 0.1f;
-
-        float angle[3];
-
-        angle[0] = ti * 3.1419f / (1000.0/60.0);
-
-        angle[1] = 0.03f * ti * 3.1419f / (1000.0/60.0);
-
-        angle[2] = ti * 3.1419f / (1000.0/60.0);
-
-        xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1];
-        yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1];
-
-        xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2];
-        yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-        zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-
-        xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3];
-        zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3];
     }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
