@@ -34,7 +34,7 @@ void main()
     vertNormal = vertNormal_in;
 
     vec4 light = modelTransform * vec4(lightPosition, 1.0);
-    lightPositionOut = vec3(light/light.w);
+    lightPositionOut = lightPosition;
 
     textureCoords = textureCoords_in;
 }
