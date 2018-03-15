@@ -70,7 +70,8 @@ void MainView::updateObjects ()
  */
 void MainView::loadTexture(QString file, GLuint texturePtr) {
     GLfloat f;
-    QVector<quint8> img = imageToBytes(QImage(file));
+    QImage qimg = QImage(file);
+    QVector<quint8> img = imageToBytes(qimg);
     glBindTexture(GL_TEXTURE_2D, texturePtr);
 
     // Anisotropic Filtering
@@ -78,7 +79,7 @@ void MainView::loadTexture(QString file, GLuint texturePtr) {
     glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAX_ANISOTROPY_EXT,f);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 512, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, qimg.width(), qimg.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img.data());
     glGenerateMipmap(GL_TEXTURE_2D);
 
 }
@@ -155,7 +156,7 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
-    loadModel(SPHERE, ":/models/sphere.obj", ":/textures/cat_diff.png");
+    loadModel(SPHERE, ":/models/sphere.obj", ":/textures/earthmap1k.png");
     loadModel(CAT, ":/models/cat.obj", ":/textures/cat_diff.png");
 
     initializeObjectsAttributes();
