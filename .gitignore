@@ -1,0 +1,8 @@
+*/build-*
+*/Code/OpenGL_*
+*.o
+*.out
+*.cmake
+*/ray
+*/build/*
+*/scenes/*.png

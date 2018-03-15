@@ -1,0 +1,52 @@
+Normal shader:
+    -When not using the normal transformation matrix, the colors will be static from the model reference 
+    (i.e.: if the model is the cat, it's back will always be green independently from the scaling/rotation, 
+    because according to the model vertexes, it's back will be where the normals are closer to the (0, 1, 0) vector). 
+    When using the normal transformation matrix, the colors will be relative the transformations that ocurred to the model, 
+    therefore, the upper parts of the model (from our prespective) will always be green. 
+    In the case of the sphere, you nearly can't notice when it is rotating.
+
+Wrapping parameters:
+
+    GL_TEXTURE_WRAP_S
+
+    Sets the wrap parameter for texture coordinate s to either GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER, GL_MIRRORED_REPEAT, GL_REPEAT, or GL_MIRROR_CLAMP_TO_EDGE.
+
+        GL_CLAMP_TO_EDGE causes s coordinates to be clamped to the range range, where N is the size of the texture in the direction of clamping.
+
+        GL_CLAMP_TO_BORDER evaluates s coordinates in a similar manner to GL_CLAMP_TO_EDGE.
+        However, in cases where clamping would have occurred in GL_CLAMP_TO_EDGE mode, the fetched texel data is substituted with the values specified by GL_TEXTURE_BORDER_COLOR.
+
+        GL_REPEAT causes the integer part of the s coordinate to be ignored;
+        the GL uses only the fractional part, thereby creating a repeating pattern.
+
+        GL_MIRRORED_REPEAT causes the s coordinate to be set to the fractional part of the texture coordinate if the integer part of s is even; if the integer part of s is odd, then the s texture coordinate is set to 1-frac, where frac represents the fractional part of s.
+
+        GL_MIRROR_CLAMP_TO_EDGE causes the the s coordinate to be repeated as for GL_MIRRORED_REPEAT for one reptition of the texture, at which point the coordinate to be clamped as in GL_CLAMP_TO_EDGE.
+
+    Initially, GL_TEXTURE_WRAP_S is set to GL_REPEAT.
+
+    TL;DR These are different methods to deal with a texture when it's larger or smaller than the area it's supposed to fit in. 
+
+All of the functionalities in the assignement have been implemented, and carefully commented for a better understanding of the
+overall code. The light position in the gouraud and phong shading is set to (100, 100, 150), and can be easily changed in either of the
+vertshaders of the shading methods. (i.e. vertshader_gouraud & vertshader_phong). Find as well screenshots of the finalised 
+aspect of the cat mesh with texture and the normal map of the mesh.
+
+If need be to see the shading in action, simply replace 
+
+    materialColor = vec3(textureColor/textureColor.w);
+
+    with 
+
+    materialColor = vec3(1,1,1);
+
+In Phong's fragshader, line 33, and
+
+    fColor = color * textureColor;
+
+    with 
+
+    fColor = color;
+
+In Gouraud's fragshader.
