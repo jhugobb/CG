@@ -160,7 +160,7 @@ void MainView::initializeGL() {
 
     initializeObjectsAttributes();
 
-    timer.start(FPS);
+    //timer.start(FPS);
 }
 
 void MainView::initializeObjectsAttributes()
@@ -177,7 +177,7 @@ void MainView::initializeObjectsAttributes()
         time[i] = 0;
     }
 
-
+    xRotation[GRID] = -90;
 }
 
 void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)
@@ -226,13 +226,6 @@ void MainView::createShaderProgram()
         modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
         projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
         normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
-        amplitudesLocation[i] = shaderProgram[i].uniformLocation("amp");
-        frequenciesLocation[i] = shaderProgram[i].uniformLocation("freq");
-        phasesLocation[i] = shaderProgram[i].uniformLocation("phases");
-        lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
-        lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
-        materialLocation[i] = shaderProgram[i].uniformLocation("material");
-        timeLocation[i] = shaderProgram[i].uniformLocation("time");
     }
 }
 

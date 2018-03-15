@@ -58,11 +58,6 @@ public:
     GLfloat time[MODELINDEX::COUNT];
     float ti = 0;
 
-    //Wave characteristics
-    GLfloat amplitude[WAVENR];
-    GLfloat frequency[WAVENR];
-    GLfloat phase[WAVENR];
-
     enum ShadingMode : GLuint
     {
         WATER, COUNTSHADER
@@ -72,13 +67,6 @@ public:
     GLint modelShaderTransform[COUNTSHADER];
     GLint projLocation[COUNTSHADER];
     GLint normalLocation[COUNTSHADER];
-    GLint amplitudesLocation[COUNTSHADER];
-    GLint frequenciesLocation[COUNTSHADER];
-    GLint phasesLocation[COUNTSHADER];
-    GLint materialLocation[COUNTSHADER];
-    GLint lightPositionLocation[COUNTSHADER];
-    GLint lightColorLocation[COUNTSHADER];
-    GLint timeLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);
