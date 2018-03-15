@@ -3,14 +3,14 @@
 // Constants
 
 // Inputs to the fragment shader
-in vec3 vertNormal;
+in vec2 uvCoor;
 
 // Uniforms of the fragment shaders
 
 // Output of the fragment shader
-out vec4 fNormal;
+out vec4 fColor;
 
 void main()
 {
-    fNormal = vec4(normalize(vertNormal), 1.0);
+    fColor = vec4(uvCoor.x, uvCoor.y, 0.0, 1.0);
 }
