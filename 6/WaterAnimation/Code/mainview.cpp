@@ -176,7 +176,7 @@ void MainView::initializeObjectsAttributes()
         objectScale[i] = 1;
     }
 
-
+    xRotation[GRID] = -90;
 }
 
 void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)

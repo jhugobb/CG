@@ -14,7 +14,6 @@ uniform mat4 projTransform;
 
 
 // Output of the vertex stage
-out vec2 uvCoor;
 out vec3 vertNormal;
 
 void main()
@@ -26,9 +25,8 @@ void main()
     vec3 vertCoor = vertCoordinates_in;
     // gl_Position is the output (a vec4) of the vertex shader
     gl_Position = projTransform * modelTransform * vec4(vertCoor.x, vertCoor.y, amp * sin(2.0 * M_PI * (freq * vertCoor.x + phase + time)), 1.0);
-    uvCoor = uvCoor_in;
 
-    float dU = amp * 2.0 * M_PI * freq * cos(2.0 * M_PI * (freq * uvCoor_in.x + phase + time));
+    float dU = amp * 2.0 * M_PI * freq * cos(2.0 * M_PI * (freq * (uvCoor_in.x * 2  - 1) + phase + time));
     float dV = 0;
     vec3 normal = normalize(vec3(-dU, -dV, 1.0));
     vertNormal = normal;
