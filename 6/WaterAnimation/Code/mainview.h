@@ -75,6 +75,9 @@ public:
     GLint amplitudesLocation[COUNTSHADER];
     GLint frequenciesLocation[COUNTSHADER];
     GLint phasesLocation[COUNTSHADER];
+    GLint materialLocation[COUNTSHADER];
+    GLint lightPositionLocation[COUNTSHADER];
+    GLint lightColorLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);
