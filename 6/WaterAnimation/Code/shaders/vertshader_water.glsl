@@ -18,15 +18,15 @@ out vec3 vertNormal;
 
 void main()
 {
-    float freq = 2.0;
-    float amp = 0.1;
+    float freq = 4.0;
+    float amp = 0.05;
     float phase = 0;
     float time = 0;
     vec3 vertCoor = vertCoordinates_in;
     // gl_Position is the output (a vec4) of the vertex shader
     gl_Position = projTransform * modelTransform * vec4(vertCoor.x, vertCoor.y, amp * sin(2.0 * M_PI * (freq * vertCoor.x + phase + time)), 1.0);
 
-    float dU = amp * 2.0 * M_PI * freq * cos(2.0 * M_PI * (freq * (uvCoor_in.x * 2  - 1) + phase + time));
+    float dU = amp * 2.0 * M_PI * freq * cos(2.0 * M_PI * (freq * (uvCoor_in.x * 2  - 1) + phase + time)); //uvCoor_in.x is mapped to correspond the vertex coordinate
     float dV = 0;
     vec3 normal = normalize(vec3(-dU, -dV, 1.0));
     vertNormal = normal;
