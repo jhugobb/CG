@@ -11,6 +11,7 @@ layout (location = 2) in vec2 uvCoor_in;
 // Uniforms of the vertex shader
 uniform mat4 modelTransform;
 uniform mat4 projTransform;
+uniform mat3 normalTransform;
 uniform float amp[WAVENR];
 uniform float freq[WAVENR];
 uniform float phase[WAVENR];
@@ -46,5 +47,5 @@ void main()
 
     float dV = 0;
     vec3 normal = normalize(vec3(-dU, -dV, 1.0));
-    vertNormal = normal;
+    vertNormal = (normalTransform * normal);
 }

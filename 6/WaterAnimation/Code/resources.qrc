@@ -15,5 +15,7 @@
         <file>models/grid.obj</file>
         <file>shaders/fragshader_water.glsl</file>
         <file>shaders/vertshader_water.glsl</file>
+        <file>shaders/fragshader_phong.glsl</file>
+        <file>shaders/vertshader_phong.glsl</file>
     </qresource>
 </RCC>
