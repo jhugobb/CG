@@ -183,9 +183,9 @@ void MainView::initializeObjectsAttributes()
     amplitude[1] = 0.03;
     amplitude[2] = 0.05;
     amplitude[3] = 0.075;
-    amplitude[4] = 0.1;
+    amplitude[4] = 0.05;
     amplitude[5] = 0.015;
-    amplitude[6] = 0.9;
+    amplitude[6] = 0.03;
     amplitude[7] = 0.08;
     frequency[0] = 1;
     frequency[1] = 2;
