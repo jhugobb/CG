@@ -178,6 +178,32 @@ void MainView::initializeObjectsAttributes()
     }
 
     xRotation[GRID] = -90;
+
+    //Waves
+    amplitude[0] = 0.001;
+    amplitude[1] = 0.03;
+    amplitude[2] = 0.05;
+    amplitude[3] = 0.075;
+    amplitude[4] = 0.05;
+    amplitude[5] = 0.015;
+    amplitude[6] = 0.03;
+    amplitude[7] = 0.08;
+    frequency[0] = 1;
+    frequency[1] = 2;
+    frequency[2] = 0.5;
+    frequency[3] = 4;
+    frequency[4] = 0.25;
+    frequency[5] = 5;
+    frequency[6] = 0.2;
+    frequency[7] = 6;
+    phase[0] = 0;
+    phase[1] = 0;
+    phase[2] = 0;
+    phase[3] = 0;
+    phase[4] = 0;
+    phase[5] = 0;
+    phase[6] = 0;
+    phase[7] = 0;
 }
 
 void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)
@@ -226,6 +252,9 @@ void MainView::createShaderProgram()
         modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
         projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
         normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
+        amplitudesLocation[i] = shaderProgram[i].uniformLocation("amp");
+        frequenciesLocation[i] = shaderProgram[i].uniformLocation("freq");
+        phasesLocation[i] = shaderProgram[i].uniformLocation("phases");
     }
 }
 
@@ -264,10 +293,13 @@ void MainView::paintGL() {
         glUniform1fv(amplitudesLocation[i], WAVENR, amplitude);
         glUniform1fv(frequenciesLocation[i], WAVENR, frequency);
         glUniform1fv(phasesLocation[i], WAVENR, phase);
+<<<<<<< HEAD
         glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
         glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
         glUniform4fv(materialLocation[currentShade], 1, material);
         glUniform1f(timeLocation[currentShade], time[i]);
+=======
+>>>>>>> 36e89bb... Multiple waves
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture[i]);
 
