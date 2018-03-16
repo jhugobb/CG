@@ -19,7 +19,7 @@ uniform float phase[WAVENR];
 
 
 // Output of the vertex stage
-out vec3 vertNormal;
+out vec3 N;
 
 float waveHeight(int waveIdx, float u)
 {
@@ -47,5 +47,5 @@ void main()
 
     float dV = 0;
     vec3 normal = normalize(vec3(-dU, -dV, 1.0));
-    vertNormal = (normalTransform * normal);
+    N = (normalTransform * normal);
 }

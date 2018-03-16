@@ -147,7 +147,7 @@ void MainView::initializeGL() {
     glDepthFunc(GL_LEQUAL);
 
     // Set the color of the screen to be black on clear (new frame)
-    glClearColor(0.8f, 0.8f, 0.8f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
     createShaderProgram();
 
@@ -254,6 +254,9 @@ void MainView::createShaderProgram()
         amplitudesLocation[i] = shaderProgram[i].uniformLocation("amp");
         frequenciesLocation[i] = shaderProgram[i].uniformLocation("freq");
         phasesLocation[i] = shaderProgram[i].uniformLocation("phases");
+        lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
+        lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
+        materialLocation[i] = shaderProgram[i].uniformLocation("material");
     }
 }
 
@@ -268,6 +271,10 @@ void MainView::createShaderProgram()
 void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    float lightColor[3] = {1.0, 1.0, 1.0};
+    float material[4] = {0.2, 0.8, 0.5, 20};
+    float lightPosition[3] = {100.0, 100.0, 150.0};
 
     //Animation
 
@@ -288,6 +295,9 @@ void MainView::paintGL() {
         glUniform1fv(amplitudesLocation[i], WAVENR, amplitude);
         glUniform1fv(frequenciesLocation[i], WAVENR, frequency);
         glUniform1fv(phasesLocation[i], WAVENR, phase);
+        glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
+        glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
+        glUniform4fv(materialLocation[currentShade], 1, material);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture[i]);
 
