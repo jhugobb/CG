@@ -55,6 +55,7 @@ public:
     qreal yGeneralRotation = 0;
     qreal zGeneralRotation = 0;
     int modelSize[MODELINDEX::COUNT];
+    GLfloat time[MODELINDEX::COUNT];
     float ti = 0;
 
     //Wave characteristics
@@ -77,6 +78,7 @@ public:
     GLint materialLocation[COUNTSHADER];
     GLint lightPositionLocation[COUNTSHADER];
     GLint lightColorLocation[COUNTSHADER];
+    GLint timeLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);
