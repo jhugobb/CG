@@ -160,7 +160,7 @@ void MainView::initializeGL() {
 
     initializeObjectsAttributes();
 
-    //timer.start(FPS);
+    timer.start(FPS);
 }
 
 void MainView::initializeObjectsAttributes()
@@ -174,6 +174,7 @@ void MainView::initializeObjectsAttributes()
         yTranslation[i] = 0;
         zTranslation[i] = 0;
         objectScale[i] = 1;
+        time[i] = 0;
     }
 
     xRotation[GRID] = -90;
@@ -257,6 +258,7 @@ void MainView::createShaderProgram()
         lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
         lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
         materialLocation[i] = shaderProgram[i].uniformLocation("material");
+        timeLocation[i] = shaderProgram[i].uniformLocation("time");
     }
 }
 
@@ -298,6 +300,7 @@ void MainView::paintGL() {
         glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
         glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
         glUniform4fv(materialLocation[currentShade], 1, material);
+        glUniform1f(timeLocation[currentShade], time[i]);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture[i]);
 
@@ -312,6 +315,7 @@ void MainView::paintGL() {
 void MainView::animate() {
     if (animationIsRunning)
     {
+        time[GRID] += 1.0/60.0;
     }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
