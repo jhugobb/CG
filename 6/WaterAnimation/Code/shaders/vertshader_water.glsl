@@ -15,6 +15,7 @@ uniform mat3 normalTransform;
 uniform float amp[WAVENR];
 uniform float freq[WAVENR];
 uniform float phase[WAVENR];
+uniform float time;
 //uniform mat3 normalTransform;
 
 
@@ -26,12 +27,12 @@ out vec3 eyePosition;
 
 float waveHeight(int waveIdx, float u)
 {
-    return amp[waveIdx] * sin(2.0 * M_PI * (freq[waveIdx] * u + phase[waveIdx] /*+ time*/));
+    return amp[waveIdx] * sin(2.0 * M_PI * (freq[waveIdx] * u + phase[waveIdx] + time));
 }
 
 float waveDU(int waveIdx, float u)
 {
-    return amp[waveIdx] * 2.0 * M_PI * freq[waveIdx] * cos(2.0 * M_PI * (freq[waveIdx] * u + phase[waveIdx]  /*+time*/));
+    return amp[waveIdx] * 2.0 * M_PI * freq[waveIdx] * cos(2.0 * M_PI * (freq[waveIdx] * u + phase[waveIdx]  +time));
 }
 
 void main()
