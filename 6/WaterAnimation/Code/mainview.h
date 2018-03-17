@@ -15,6 +15,7 @@
 #include <QMatrix4x4>
 
 #define FPS 1000.0/60.0
+#define WAVENR 8
 class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
 
@@ -25,10 +26,7 @@ class MainView : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 public:
     enum MODELINDEX : int
     {
-        JUPITER = 0,
-        MOON1,
-        MOON2,
-        MOON3,
+        GRID,
         COUNT
     };
 
@@ -57,23 +55,30 @@ public:
     qreal yGeneralRotation = 0;
     qreal zGeneralRotation = 0;
     int modelSize[MODELINDEX::COUNT];
+    GLfloat time[MODELINDEX::COUNT];
     float ti = 0;
-    float distanceToJupiter[MODELINDEX::COUNT];
+
+    //Wave characteristics
+    GLfloat amplitude[WAVENR];
+    GLfloat frequency[WAVENR];
+    GLfloat phase[WAVENR];
 
     enum ShadingMode : GLuint
     {
-        PHONG = 0, NORMAL, GOURAUD, COUNTSHADER
+        WATER, COUNTSHADER
     };
 
     QOpenGLShaderProgram shaderProgram[COUNTSHADER];
     GLint modelShaderTransform[COUNTSHADER];
     GLint projLocation[COUNTSHADER];
     GLint normalLocation[COUNTSHADER];
-    GLint samplerLocation[COUNTSHADER];
-    GLint lightPositionLocation[COUNTSHADER];
-    GLint materialColorLocation[COUNTSHADER];
-    GLint lightColorLocation[COUNTSHADER];
+    GLint amplitudesLocation[COUNTSHADER];
+    GLint frequenciesLocation[COUNTSHADER];
+    GLint phasesLocation[COUNTSHADER];
     GLint materialLocation[COUNTSHADER];
+    GLint lightPositionLocation[COUNTSHADER];
+    GLint lightColorLocation[COUNTSHADER];
+    GLint timeLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);

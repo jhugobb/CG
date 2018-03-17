@@ -147,7 +147,7 @@ void MainView::initializeGL() {
     glDepthFunc(GL_LEQUAL);
 
     // Set the color of the screen to be black on clear (new frame)
-    glClearColor(0.2f, 0.5f, 0.7f, 0.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
     createShaderProgram();
 
@@ -156,10 +156,7 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
-    loadModel(JUPITER, ":/models/sphere.obj", ":/textures/jupitermap.jpg");
-    loadModel(MOON1, ":/models/sphere.obj", ":/textures/mars_1k_color.jpg");
-    loadModel(MOON2, ":/models/sphere.obj", ":/textures/mercurymap.jpg");
-    loadModel(MOON3, ":/models/sphere.obj", ":/textures/earthmap1k.png");
+    loadModel(GRID, ":/models/grid.obj", NULL);
 
     initializeObjectsAttributes();
 
@@ -177,32 +174,46 @@ void MainView::initializeObjectsAttributes()
         yTranslation[i] = 0;
         zTranslation[i] = 0;
         objectScale[i] = 1;
+        time[i] = 0;
     }
 
-    distanceToJupiter[JUPITER] = 0;
-    distanceToJupiter[MOON1] = 3;
-    distanceToJupiter[MOON2] = 4;
-    distanceToJupiter[MOON3] = 1.5;
+    xRotation[GRID] = -90;
 
-    xTranslation[JUPITER] = 0;
-
-    xTranslation[MOON1] = distanceToJupiter[MOON1];
-    objectScale[MOON1] = 0.2;
-
-    yTranslation[MOON2] = distanceToJupiter[MOON2];
-    objectScale[MOON2] = 0.3;
-
-    xTranslation[MOON3] = distanceToJupiter[MOON3];
-    objectScale[MOON3] = 0.1;
-
-
+    //Waves
+    amplitude[0] = 0.001;
+    amplitude[1] = 0.03;
+    amplitude[2] = 0.05;
+    amplitude[3] = 0.075;
+    amplitude[4] = 0.05;
+    amplitude[5] = 0.015;
+    amplitude[6] = 0.03;
+    amplitude[7] = 0.08;
+    frequency[0] = 1;
+    frequency[1] = 2;
+    frequency[2] = 0.5;
+    frequency[3] = 4;
+    frequency[4] = 0.25;
+    frequency[5] = 5;
+    frequency[6] = 0.2;
+    frequency[7] = 6;
+    phase[0] = 0;
+    phase[1] = 0;
+    phase[2] = 0;
+    phase[3] = 0;
+    phase[4] = 0;
+    phase[5] = 0;
+    phase[6] = 0;
+    phase[7] = 0;
 }
 
 void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath)
 {
     Model m = Model(objPath);
     m.unitize();
-    loadTexture(texturePath, texture[modelNr]);
+    if (texturePath != NULL)
+        loadTexture(texturePath, texture[modelNr]);
+    else
+        texture[modelNr] = -1;
     QVector<QVector3D> vm = m.getVertices();
     modelSize[modelNr] = vm.size();
     Vertex vv[modelSize[modelNr]];
@@ -228,24 +239,11 @@ void MainView::loadModel(MODELINDEX modelNr,  char const *objPath, char const *t
 
 void MainView::createShaderProgram()
 {
-    //NORMAL
-    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                  ":/shaders/vertshader_normal.glsl");
-    shaderProgram[NORMAL].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                  ":/shaders/fragshader_normal.glsl");
-    //PHONG
-
-    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                 ":/shaders/vertshader_phong.glsl");
-    shaderProgram[PHONG].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                 ":/shaders/fragshader_phong.glsl");
-
-    //GOURAUD
-
-    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Vertex,
-                                                   ":/shaders/vertshader_gouraud.glsl");
-    shaderProgram[GOURAUD].addShaderFromSourceFile(QOpenGLShader::Fragment,
-                                                   ":/shaders/fragshader_gouraud.glsl");
+    //WATER
+    shaderProgram[WATER].addShaderFromSourceFile(QOpenGLShader::Vertex,
+                                                  ":/shaders/vertshader_water.glsl");
+    shaderProgram[WATER].addShaderFromSourceFile(QOpenGLShader::Fragment,
+                                                  ":/shaders/fragshader_water.glsl");
 
     for (GLuint i = 0 ; i < COUNTSHADER ; i++)
     {
@@ -254,11 +252,13 @@ void MainView::createShaderProgram()
         modelShaderTransform[i]= shaderProgram[i].uniformLocation("modelTransform");
         projLocation[i] = shaderProgram[i].uniformLocation("projTransform");
         normalLocation[i] = shaderProgram[i].uniformLocation("normalTransform");
-        samplerLocation[i] = shaderProgram[i].uniformLocation("samplerUniform");
+        amplitudesLocation[i] = shaderProgram[i].uniformLocation("amp");
+        frequenciesLocation[i] = shaderProgram[i].uniformLocation("freq");
+        phasesLocation[i] = shaderProgram[i].uniformLocation("phases");
         lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
-        materialColorLocation[i] = shaderProgram[i].uniformLocation("materialColor");
         lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
         materialLocation[i] = shaderProgram[i].uniformLocation("material");
+        timeLocation[i] = shaderProgram[i].uniformLocation("time");
     }
 }
 
@@ -274,6 +274,10 @@ void MainView::paintGL() {
     // Clear the screen before rendering
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    float lightColor[3] = {1.0, 1.0, 1.0};
+    float material[4] = {0.2, 0.8, 0.1, 1};
+    float lightPosition[3] = {100.0, 100.0, 150.0};
+
     //Animation
 
     animate();
@@ -281,25 +285,22 @@ void MainView::paintGL() {
     updateProjectionMatrix();
     updateObjects();
 
-    float lightColor[3] = {1.0, 1.0, 1.0};
-    float materialColor[3] = {1.0, 1.0, 1.0};
-    float material[4] = {0.2, 0.8, 0.0, 1};
-    float lightPosition[3] = {100.0, 100.0, 150.0};
-
     shaderProgram[currentShade].bind();
 
     glUniformMatrix4fv(projLocation[currentShade], 1, GL_FALSE, (GLfloat *) projMatrix.data());
-    glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
-    glUniform3fv(materialColorLocation[currentShade], 1, materialColor);
-    glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
-    glUniform4fv(materialLocation[currentShade], 1, material);
-    glUniform1i(samplerLocation[currentShade], 0);
 
     //models
 
     for (int i = 0 ; i < MODELINDEX::COUNT ; i++)
     {
         glUniformMatrix3fv(normalLocation[currentShade], 1, GL_FALSE, (GLfloat *) objectMatrix[i].normalMatrix().data());
+        glUniform1fv(amplitudesLocation[i], WAVENR, amplitude);
+        glUniform1fv(frequenciesLocation[i], WAVENR, frequency);
+        glUniform1fv(phasesLocation[i], WAVENR, phase);
+        glUniform3fv(lightColorLocation[currentShade], 1, lightColor);
+        glUniform3fv(lightPositionLocation[currentShade], 1, lightPosition);
+        glUniform4fv(materialLocation[currentShade], 1, material);
+        glUniform1f(timeLocation[currentShade], time[i]);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture[i]);
 
@@ -314,32 +315,7 @@ void MainView::paintGL() {
 void MainView::animate() {
     if (animationIsRunning)
     {
-        // Makes jupiter rotate around itself
-        AddRotation(JUPITER, 0, 0.3, 0);
-        AddRotation(MOON1, 0.3, 0, 0);
-        AddRotation(MOON2, 0, 0.6, 0);
-        AddRotation(MOON3, 0, 0, 0.9);
-
-        // variable that determines the step of the orbit
-        ti += 0.1f;
-
-        float angle[3];
-
-        angle[0] = ti * 3.1419f / (1000.0/60.0);
-
-        angle[1] = 0.03f * ti * 3.1419f / (1000.0/60.0);
-
-        angle[2] = ti * 3.1419f / (1000.0/60.0);
-
-        xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1];
-        yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1];
-
-        xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2];
-        yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-        zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-
-        xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3];
-        zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3];
+        time[GRID] += 1.0/60.0;
     }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
