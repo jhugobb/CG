@@ -160,6 +160,8 @@ void MainView::initializeGL() {
     loadModel(MOON1, ":/models/sphere.obj", ":/textures/mars_1k_color.jpg");
     loadModel(MOON2, ":/models/sphere.obj", ":/textures/mercurymap.jpg");
     loadModel(MOON3, ":/models/sphere.obj", ":/textures/earthmap1k.png");
+    loadModel(SURFACE, ":/models/grid.obj", ":/textures/rug_logo.png");
+    loadModel(CAT, ":/models/cat.obj", ":/textures/cat_diff.png");
 
     initializeObjectsAttributes();
 
@@ -177,6 +179,7 @@ void MainView::initializeObjectsAttributes()
         yTranslation[i] = 0;
         zTranslation[i] = 0;
         objectScale[i] = 1;
+        ti[i] = 0;
     }
 
     distanceToJupiter[JUPITER] = 0;
@@ -185,6 +188,7 @@ void MainView::initializeObjectsAttributes()
     distanceToJupiter[MOON3] = 1.5;
 
     xTranslation[JUPITER] = 0;
+    yTranslation[JUPITER] = 6;
 
     xTranslation[MOON1] = distanceToJupiter[MOON1];
     objectScale[MOON1] = 0.2;
@@ -194,6 +198,9 @@ void MainView::initializeObjectsAttributes()
 
     xTranslation[MOON3] = distanceToJupiter[MOON3];
     objectScale[MOON3] = 0.1;
+
+    xRotation[SURFACE] = -90;
+    objectScale[SURFACE] = 10;
 
 
 }
@@ -311,9 +318,25 @@ void MainView::paintGL() {
     shaderProgram[currentShade].release();
 }
 
+void MainView::freeFallJump(MODELINDEX jumper, MODELINDEX surface, qreal initialVelocity)
+{
+    const qreal G = -9.8;
+
+    if (yTranslation[jumper] < yTranslation[surface])
+        ti[jumper] = 0;
+    ti[jumper] += FPS/1000; //since there's a frame every 1000/60 milisseconds, we should add 1/60 of a second to the time variable at each frame
+
+    yTranslation[jumper] = yTranslation[surface] + initialVelocity * ti[jumper] + 0.5 * G * ti[jumper] * ti[jumper];
+}
+
 void MainView::animate() {
     if (animationIsRunning)
     {
+        //Time variable
+        ti[JUPITER] += 0.1f;
+        ti[MOON1] += 0.1f;
+        ti[MOON2] += 0.1f;
+        ti[MOON3] += 0.1f;
         // Makes jupiter rotate around itself
         AddRotation(JUPITER, 0, 0.3, 0);
         AddRotation(MOON1, 0.3, 0, 0);
@@ -321,25 +344,28 @@ void MainView::animate() {
         AddRotation(MOON3, 0, 0, 0.9);
 
         // variable that determines the step of the orbit
-        ti += 0.1f;
 
         float angle[3];
 
-        angle[0] = ti * 3.1419f / (1000.0/60.0);
+        angle[0] = ti[MOON1] * 3.1419f / (FPS);
 
-        angle[1] = 0.03f * ti * 3.1419f / (1000.0/60.0);
+        angle[1] = 0.03f * ti[MOON1] * 3.1419f / (FPS);
 
-        angle[2] = ti * 3.1419f / (1000.0/60.0);
+        angle[2] = ti[MOON1] * 3.1419f / (FPS);
 
-        xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1];
-        yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1];
+        xTranslation[MOON1] = sin(angle[0]) * distanceToJupiter[MOON1] + xTranslation[JUPITER];
+        yTranslation[MOON1] = cos(angle[0]) * distanceToJupiter[MOON1] + yTranslation[JUPITER];
+        zTranslation[MOON1] = zTranslation[JUPITER];
 
-        xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2];
-        yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
-        zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2];
+        xTranslation[MOON2] = sin(angle[1]) * distanceToJupiter[MOON2] + xTranslation[JUPITER];
+        yTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2] + yTranslation[JUPITER];
+        zTranslation[MOON2] = cos(angle[1]) * distanceToJupiter[MOON2] + zTranslation[JUPITER];
 
-        xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3];
-        zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3];
+        xTranslation[MOON3] = sin(angle[2]) * distanceToJupiter[MOON3] + xTranslation[JUPITER];
+        yTranslation[MOON3] = yTranslation[JUPITER];
+        zTranslation[MOON3] = cos(angle[2]) * distanceToJupiter[MOON3] + zTranslation[JUPITER];
+
+        freeFallJump(CAT, SURFACE, 5);
     }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
