@@ -273,7 +273,7 @@ void MainView::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     float lightColor[3] = {1.0, 1.0, 1.0};
-    float material[4] = {0.2, 0.8, 0.5, 20};
+    float material[4] = {0.2, 0.8, 0.1, 1};
     float lightPosition[3] = {100.0, 100.0, 150.0};
 
     //Animation
