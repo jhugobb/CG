@@ -18,5 +18,6 @@
         <file>textures/mars_1k_color.jpg</file>
         <file>textures/mercurymap.jpg</file>
         <file>textures/jupitermap.jpg</file>
+        <file>models/grid.obj</file>
     </qresource>
 </RCC>

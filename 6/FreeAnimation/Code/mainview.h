@@ -29,6 +29,8 @@ public:
         MOON1,
         MOON2,
         MOON3,
+        SURFACE,
+        CAT,
         COUNT
     };
 
@@ -41,8 +43,8 @@ public:
 
     bool animationIsRunning = true;
     qreal perspectiveRotation = 0;
-    qreal perspectiveHeight = 90; //also in degrees
-    qreal perspectiveDistance = 10;
+    qreal perspectiveHeight = 20; //also in degrees
+    qreal perspectiveDistance = 15;
     qreal projectionRatio = 1;
 
     qreal xRotation[MODELINDEX::COUNT];
@@ -57,7 +59,7 @@ public:
     qreal yGeneralRotation = 0;
     qreal zGeneralRotation = 0;
     int modelSize[MODELINDEX::COUNT];
-    float ti = 0;
+    float ti[MODELINDEX::COUNT];
     float distanceToJupiter[MODELINDEX::COUNT];
 
     enum ShadingMode : GLuint
@@ -92,6 +94,7 @@ public:
     void loadModel(MODELINDEX modelNr,  char const *objPath, char const *texturePath);
     void initializeObjectsAttributes();
     void updateProjectionMatrix();
+    void freeFallJump(MODELINDEX jumper, MODELINDEX surface, qreal initialVelocity);
 
 protected:
     void initializeGL();
