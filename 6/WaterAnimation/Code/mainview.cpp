@@ -160,7 +160,7 @@ void MainView::initializeGL() {
 
     initializeObjectsAttributes();
 
-    //timer.start(FPS);
+    timer.start(FPS);
 }
 
 void MainView::initializeObjectsAttributes()
@@ -258,6 +258,7 @@ void MainView::createShaderProgram()
         lightColorLocation[i] = shaderProgram[i].uniformLocation("lightColor");
         lightPositionLocation[i] = shaderProgram[i].uniformLocation("lightPosition");
         materialLocation[i] = shaderProgram[i].uniformLocation("material");
+        timeLocation[i] = shaderProgram[i].uniformLocation("time");
     }
 }
 
@@ -314,6 +315,7 @@ void MainView::paintGL() {
 void MainView::animate() {
     if (animationIsRunning)
     {
+        time[GRID] += 1.0/60.0;
     }
 }
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
