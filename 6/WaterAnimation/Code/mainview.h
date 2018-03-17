@@ -78,6 +78,7 @@ public:
     GLint materialLocation[COUNTSHADER];
     GLint lightPositionLocation[COUNTSHADER];
     GLint lightColorLocation[COUNTSHADER];
+    GLint timeLocation[COUNTSHADER];
     GLuint currentShade = 0;
 
     MainView(QWidget *parent = 0);
