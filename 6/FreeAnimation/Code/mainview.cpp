@@ -156,6 +156,7 @@ void MainView::initializeGL() {
     glGenVertexArrays(COUNT, vao);
     glGenTextures(COUNT, texture);
 
+    // Loading the models
     loadModel(JUPITER, ":/models/sphere.obj", ":/textures/jupitermap.jpg");
     loadModel(MOON1, ":/models/sphere.obj", ":/textures/mars_1k_color.jpg");
     loadModel(MOON2, ":/models/sphere.obj", ":/textures/mercurymap.jpg");
@@ -168,6 +169,13 @@ void MainView::initializeGL() {
     timer.start(FPS);
 }
 
+
+
+/**
+ * @brief MainView::initializeObjectsAttributes
+ *
+ * Initializes the attributes of the models
+ */
 void MainView::initializeObjectsAttributes()
 {
     for (int i = 0 ; i < COUNT ; i++)
@@ -329,6 +337,13 @@ void MainView::freeFallJump(MODELINDEX jumper, MODELINDEX surface, qreal initial
     yTranslation[jumper] = yTranslation[surface] + initialVelocity * ti[jumper] + 0.5 * G * ti[jumper] * ti[jumper];
 }
 
+
+/**
+ * @brief MainView::animate
+ *
+ * Called every time we want to compute the next frame of the models' animation
+ *
+ */
 void MainView::animate() {
     if (animationIsRunning)
     {
@@ -368,6 +383,8 @@ void MainView::animate() {
         freeFallJump(CAT, SURFACE, 5);
     }
 }
+
+
 void MainView::AddRotation(int index, qreal x, qreal y, qreal z)
 {
     xRotation[index] += x;
