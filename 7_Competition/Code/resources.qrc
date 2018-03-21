@@ -35,7 +35,7 @@
         <file>textures/star_floor.jpg</file>
         <file>models/bb8.obj</file>
         <file>textures/bb8_diff.jpg</file>
-        <file>models/bb-8.obj</file>
         <file>textures/bb8.jpg</file>
+        <file>models/bb8.mtl</file>
     </qresource>
 </RCC>

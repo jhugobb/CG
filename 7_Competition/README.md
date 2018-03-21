@@ -13,3 +13,4 @@ Instructions:
 -Reset the level with 'r'.
 -Press 'm' to go to the next level or 'n' to go to the previous.
 -Press 'p' to change between 1st and 3st person modes.
+-Press 't' to change between themes. (might take a bit to load)
