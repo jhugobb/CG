@@ -62,19 +62,22 @@ void MainView::keyPressEvent(QKeyEvent *ev)
             personMode = FIRST;
         qDebug() << "P pressed, reset";
         break;
-    /*case ' ':
-        if (animationIsRunning)
-        {
-            timer.stop();
-            animationIsRunning = false;
+    case 'T':
+        if (textureMode == MINECRAFT) {
+            textureMode = STARWARS;
+            loadModel(WALLS, ":/models/cube.obj", ":/textures/star_wall.jpg");
+            loadModel(BOXES, ":/models/sphere.obj", ":/textures/deathstar.png");
+            loadModel(CHARACTER, ":/models/bb8.obj", ":/textures/bb8.jpg");
+            loadModel(FLAGS, ":/models/grid.obj", ":/textures/red.png");
+            loadModel(SURFACE, ":/models/grid.obj", ":/textures/star_floor.jpg");
+        } else {
+            textureMode = MINECRAFT;
+            loadModel(WALLS, ":/models/cube.obj", ":/textures/rock.png");
+            loadModel(BOXES, ":/models/cube.obj", ":/textures/wood.png");
+            loadModel(CHARACTER, ":/models/cat.obj", ":/textures/cat_diff.png");
+            loadModel(FLAGS, ":/models/grid.obj", ":/textures/red.png");
+            loadModel(SURFACE, ":/models/grid.obj", ":/textures/grass.png");
         }
-        else
-        {
-            timer.start(FPS);
-            animationIsRunning = true;
-        }
-        qDebug() << "SPACE pressed, animation is running?: " << animationIsRunning;
-        break;*/
     default:
         // ev->key() is an integer. For alpha numeric characters keys it equivalent with the char value ('A' == 65, '1' == 49)
         // Alternatively, you could use Qt Key enums, see http://doc.qt.io/qt-5/qt.html#Key-enum

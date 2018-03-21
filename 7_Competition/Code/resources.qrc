@@ -29,5 +29,13 @@
         <file>textures/wood.png</file>
         <file>textures/rock.png</file>
         <file>textures/grass.png</file>
+        <file>textures/star_wall.jpg</file>
+        <file>textures/deathstar.png</file>
+        <file>textures/wall.jpg</file>
+        <file>textures/star_floor.jpg</file>
+        <file>models/bb8.obj</file>
+        <file>textures/bb8_diff.jpg</file>
+        <file>models/bb-8.obj</file>
+        <file>textures/bb8.jpg</file>
     </qresource>
 </RCC>

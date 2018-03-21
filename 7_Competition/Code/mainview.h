@@ -43,6 +43,12 @@ public:
         THIRD
     };
 
+    enum TEXTUREMODE
+    {
+        MINECRAFT,
+        STARWARS
+    };
+
     GLuint vbo[MODELINDEX::COUNT]; // [model]
     GLuint vao[MODELINDEX::COUNT]; // [model]
     GLuint texture[MODELINDEX::COUNT]; // [model]
@@ -81,6 +87,7 @@ public:
     GLint materialLocation[COUNTSHADER];
     GLint placedBoxLocation[COUNTSHADER];
     ShadingMode currentShade = PHONG;
+    TEXTUREMODE textureMode = MINECRAFT;
 
     MainView(QWidget *parent = 0);
     ~MainView();
