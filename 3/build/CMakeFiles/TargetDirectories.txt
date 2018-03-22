@@ -1,0 +1,3 @@
+/home/red/Desktop/Brandão_Leite_Raytracer_1/build/CMakeFiles/edit_cache.dir
+/home/red/Desktop/Brandão_Leite_Raytracer_1/build/CMakeFiles/rebuild_cache.dir
+/home/red/Desktop/Brandão_Leite_Raytracer_1/build/CMakeFiles/ray.dir

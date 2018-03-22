@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/">
+        <file>models/cube.obj</file>
+        <file>models/flat_surface.obj</file>
+        <file>textures/cat_diff.png</file>
+        <file>textures/cat_norm.png</file>
+        <file>textures/cat_spec.png</file>
+        <file>textures/rug_logo.png</file>
+        <file>models/cat.obj</file>
+        <file>models/sphere.obj</file>
+        <file>textures/earthmap1k.png</file>
+        <file>textures/mars_1k_color.jpg</file>
+        <file>textures/mercurymap.jpg</file>
+        <file>textures/jupitermap.jpg</file>
+        <file>models/grid.obj</file>
+        <file>shaders/fragshader_water.glsl</file>
+        <file>shaders/vertshader_water.glsl</file>
+    </qresource>
+</RCC>
